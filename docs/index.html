@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>物語アドオン</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .container { max-width: 480px; width: 100%; }
+    h1 { font-size: 2em; margin-bottom: 4px; }
+    .meta { opacity: 0.6; margin-bottom: 24px; }
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      margin-bottom: 10px;
+      transition: transform 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-world { background: #4ade80; color: #000; }
+    .btn-addon { background: #60a5fa; color: #000; }
+    .btn-idea  { background: #f472b6; color: #000; }
+    .steps { list-style: none; counter-reset: step; }
+    .steps li {
+      counter-increment: step;
+      padding: 8px 0;
+      padding-left: 32px;
+      position: relative;
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      width: 24px; height: 24px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      font-size: 0.85em;
+    }
+    .changelog { opacity: 0.8; font-size: 0.9em; }
+    .changelog li { padding: 2px 0; }
+    #loading { text-align: center; opacity: 0.5; padding: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>物語アドオン</h1>
+    <p class="meta">
+      v<span id="ver">...</span> ・ <span id="date">...</span>
+    </p>
+
+    <div id="loading">読み込み中...</div>
+    <div id="content" style="display:none">
+
+      <a id="dl-world" class="btn btn-world" href="#">.mcworld をダウンロード</a>
+      <a id="dl-addon" class="btn btn-addon" href="#">.mcaddon をダウンロード</a>
+      <a class="btn btn-idea" href="https://github.com/nkhrhr/MineCraft/issues/new?template=story_idea.md">
+        新しいアイデアを書く
+      </a>
+
+      <div class="card">
+        <h3>あそびかた</h3>
+        <ol class="steps">
+          <li>「.mcworld をダウンロード」をタップ</li>
+          <li>「Minecraft で開く」を選ぶ</li>
+          <li>ワールドが追加される</li>
+          <li>Switch で遊ぶなら Realm にアップロード</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3>きょうの更新</h3>
+        <ul id="changes" class="changelog"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const REPO = 'nkhrhr/MineCraft';
+
+    fetch(`https://api.github.com/repos/${REPO}/releases?per_page=1`)
+      .then(r => r.json())
+      .then(([rel]) => {
+        if (!rel) return;
+        document.getElementById('ver').textContent = rel.tag_name.replace(/^v|^nightly-/,'');
+        document.getElementById('date').textContent =
+          new Date(rel.published_at).toLocaleDateString('ja-JP');
+
+        const world = rel.assets.find(a => a.name.endsWith('.mcworld'));
+        const addon = rel.assets.find(a => a.name.endsWith('.mcaddon'));
+        if (world) document.getElementById('dl-world').href = world.browser_download_url;
+        if (addon) document.getElementById('dl-addon').href = addon.browser_download_url;
+
+        const changes = document.getElementById('changes');
+        (rel.body || '変更なし').split('\n').filter(Boolean).forEach(line => {
+          const li = document.createElement('li');
+          li.textContent = line.replace(/^[-*]\s*/, '');
+          changes.appendChild(li);
+        });
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      })
+      .catch(() => {
+        document.getElementById('loading').textContent = 'まだリリースがありません';
+      });
+  </script>
+</body>
+</html>

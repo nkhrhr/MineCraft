@@ -1,0 +1,47 @@
+name: Nightly Build
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: '0 15 * * *'  # 毎日 00:00 JST
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate JSON
+        run: npm run validate
+
+      - name: Auto-increment version
+        run: |
+          node scripts/bump-version.js patch
+          echo "NEW_VERSION=$(node -p "require('./version.json').version")" >> $GITHUB_ENV
+
+      - name: Build packages
+        run: npm run pack
+
+      - name: Create .mcworld
+        run: node scripts/create-world.js
+
+      - name: Upload nightly release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly-${{ env.NEW_VERSION }}
+          name: "v${{ env.NEW_VERSION }}"
+          files: |
+            dist/*.mcworld
+            dist/*.mcaddon
+          prerelease: true
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

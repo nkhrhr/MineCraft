@@ -4,14 +4,26 @@
     "name": "Arlt Story Resources",
     "description": "Koki's first adventure - resources",
     "uuid": "d68eb447-2711-4e8b-8258-840b149a9550",
-    "version": [1, 0, 0],
-    "min_engine_version": [1, 21, 0]
+    "version": [
+      1,
+      0,
+      1
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      0
+    ]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "8f1e0109-6042-42e7-8b62-7aa52781f733",
-      "version": [1, 0, 0]
+      "version": [
+        1,
+        0,
+        1
+      ]
     }
   ]
 }

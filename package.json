@@ -6,7 +6,9 @@
     "validate": "node scripts/validate.js",
     "check-uuids": "node scripts/check-uuids.js",
     "pack": "node scripts/pack.js",
-    "release": "npm run validate && npm run pack",
+    "create-world": "node scripts/create-world.js",
+    "bump-version": "node scripts/bump-version.js",
+    "release": "npm run validate && npm run pack && npm run create-world",
     "test": "node --test tests/"
   },
   "devDependencies": {
