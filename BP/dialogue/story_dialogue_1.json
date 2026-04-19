@@ -1,0 +1,42 @@
+{
+  "format_version": "1.17",
+  "minecraft:npc_dialogue": {
+    "scenes": [
+      {
+        "scene_tag": "opening",
+        "npc_name": "案内人",
+        "text": "ようこそ、冒険者よ。この世界には大きな秘密が隠されている...",
+        "buttons": [
+          {
+            "name": "話を聞く",
+            "commands": [
+              "/say §a物語が始まります...",
+              "/dialogue change @e[type=story:npc_guide,c=1] chapter_1"
+            ]
+          },
+          {
+            "name": "後で",
+            "commands": [
+              "/say §7また後で話しかけてください"
+            ]
+          }
+        ]
+      },
+      {
+        "scene_tag": "chapter_1",
+        "npc_name": "案内人",
+        "text": "第一章：失われた遺跡\n\n古代の遺跡を探し、三つの秘宝を見つけるのだ。",
+        "buttons": [
+          {
+            "name": "クエストを受ける",
+            "commands": [
+              "/tag @p add quest_chapter1",
+              "/give @p compass 1 0 {\"item_lock\":{\"mode\":\"lock_in_inventory\"}}",
+              "/playsound random.levelup @p"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

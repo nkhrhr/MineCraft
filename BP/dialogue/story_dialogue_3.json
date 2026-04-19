@@ -1,0 +1,40 @@
+{
+  "format_version": "1.17",
+  "minecraft:npc_dialogue": {
+    "scenes": [
+      {
+        "scene_tag": "chapter_3_start",
+        "npc_name": "案内人",
+        "text": "第三章：最後の試練\n\n全ての秘宝が揃った。最後の試練を乗り越え、世界を救うのだ！",
+        "buttons": [
+          {
+            "name": "最終決戦へ",
+            "commands": [
+              "/tag @p add quest_chapter3",
+              "/tag @p remove quest_chapter2",
+              "/title @p title §c第三章",
+              "/title @p subtitle §r最後の試練",
+              "/playsound mob.enderdragon.growl @p"
+            ]
+          }
+        ]
+      },
+      {
+        "scene_tag": "ending",
+        "npc_name": "案内人",
+        "text": "おめでとう、勇者よ！\n\nお前は世界を闇から救った。この物語は永遠に語り継がれるだろう...",
+        "buttons": [
+          {
+            "name": "物語を終える",
+            "commands": [
+              "/title @p title §6§lおめでとう！",
+              "/title @p subtitle §r物語完結",
+              "/playsound ui.toast.challenge_complete @p",
+              "/tag @p add story_complete"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

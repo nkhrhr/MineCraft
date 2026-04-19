@@ -1,0 +1,17 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "物語アドオン",
+    "description": "ストーリー体験",
+    "uuid": "a3b04051-88da-4478-97db-322421420e0c",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 20, 0]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "a8b05d94-c8dc-404a-8c73-ccc9f989682a",
+      "version": [1, 0, 0]
+    }
+  ]
+}

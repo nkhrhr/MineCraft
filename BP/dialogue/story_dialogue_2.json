@@ -1,0 +1,24 @@
+{
+  "format_version": "1.17",
+  "minecraft:npc_dialogue": {
+    "scenes": [
+      {
+        "scene_tag": "chapter_2_start",
+        "npc_name": "案内人",
+        "text": "第二章：闇の森\n\nよくぞ秘宝を見つけた！次は闇の森の奥深くに眠る古代の祭壇を探すのだ。",
+        "buttons": [
+          {
+            "name": "続ける",
+            "commands": [
+              "/tag @p add quest_chapter2",
+              "/tag @p remove quest_chapter1",
+              "/title @p title §5第二章",
+              "/title @p subtitle §r闇の森",
+              "/playsound random.levelup @p"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
