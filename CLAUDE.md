@@ -15,15 +15,26 @@
 晄希が GitHub Issue にアイデアを書く → Claude が実装する → 結果を見て次の Issue を書く。
 このサイクルの中で「仕様を書く力」が自然に育つ。
 
-## PDCA ループ
+## PDCA ループ（お父さんはメールで見るだけ）
 
 ```
-🌙 夜: 晄希が iDoraPad でアイデアを書く（ダッシュボード or GitHub Issue）
-🤖 Claude Code が読んで実装 → push
-⚙️ GitHub Actions が毎晩 0時 JST に自動ビルド（.mcworld + .mcaddon）
-📱 夕方: iDoraPad で DL → Minecraft にインポート → Realm アップロード
-🎮 Switch で Realms 参加して遊ぶ
+🌙 晄希が Issue を書く（ダッシュボード or GitHub）
+        ↓ 自動: interpret-idea.yml
+🤖 Claude が「こう理解したよ」と構造化してコメント
+        ↓
+📖 晄希が読む →「合ってる → Go！」or「違う → 修正指示」
+        ↓ 自動: implement-idea.yml（"Go" コメントで発火）
+🔨 Claude が実装 → PR 作成 → 📧 お父さんにメール通知
+        ↓ auto-merge or お父さんが確認
+⚙️ nightly-build.yml が毎晩 0時 JST に .mcworld 自動ビルド
+📱 夕方: iDoraPad で DL → Realm → 🎮 Switch
 ```
+
+### 言語化トレーニングとしてのループ
+このフローの核心は「interpret → Go」のステップ。
+晄希が書いた文章を Claude が構造化し直すことで、
+「自分の言語化がどう伝わったか」の差分が可視化される。
+その差分を修正指示として書き直す行為が、言語化能力を鍛える。
 
 ## デバイス構成
 
@@ -116,6 +127,19 @@ git push origin master --tags
 ```
 → release.yml が正式 Release 作成
 
+## 自動化ワークフロー
+
+| ワークフロー | トリガー | 処理 |
+|---|---|---|
+| `interpret-idea.yml` | Issue 作成（label: story） | Claude がアイデアを構造化してコメント |
+| `implement-idea.yml` | "Go" コメント | Claude が実装 → PR 作成 |
+| `nightly-build.yml` | 毎日 0時 JST / master push | .mcworld + .mcaddon ビルド → Release |
+| `validate.yml` | push / PR | JSON 検証 |
+| `release.yml` | タグ push (v*) | 正式 Release 作成 |
+
+### GitHub Secrets 必須
+- `ANTHROPIC_API_KEY` — Claude API キー（interpret / implement に必要）
+
 ## 今後の予定
 
 - [ ] Cloudflare Pages + Workers + D1 で晄希専用ダッシュボード構築
@@ -123,4 +147,5 @@ git push origin master --tags
   - 最新ビルド DL ボタン
   - 成長記録ログ（過去のアイデア一覧）
   - 冒険者レベルシステム
+- [ ] PR auto-merge 設定（お父さんが放置しても進む）
 - [ ] iOS Shortcuts で .mcworld 自動ダウンロード通知

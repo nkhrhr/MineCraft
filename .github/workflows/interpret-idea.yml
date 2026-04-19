@@ -1,0 +1,25 @@
+name: Interpret Idea
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  interpret:
+    if: contains(github.event.issue.labels.*.name, 'story')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Claude がアイデアを構造化
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: node scripts/claude-interpret.js

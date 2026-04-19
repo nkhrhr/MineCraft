@@ -1,0 +1,40 @@
+name: Implement Idea
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  implement:
+    # 晄希が "Go" "go" "いいよ" "OK" とコメントしたら実装開始
+    if: >
+      contains(github.event.issue.labels.*.name, 'story') &&
+      github.event.issue.state == 'open' &&
+      (
+        contains(github.event.comment.body, 'Go') ||
+        contains(github.event.comment.body, 'go') ||
+        contains(github.event.comment.body, 'いいよ') ||
+        contains(github.event.comment.body, 'OK') ||
+        contains(github.event.comment.body, 'ok') ||
+        contains(github.event.comment.body, 'おねがい') ||
+        contains(github.event.comment.body, 'やって')
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Git 設定
+        run: |
+          git config user.name "arlt-story-bot"
+          git config user.email "bot@arlt-story.dev"
+
+      - name: Claude が実装
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/claude-implement.js
