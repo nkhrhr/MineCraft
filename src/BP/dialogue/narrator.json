@@ -1,0 +1,81 @@
+{
+  "format_version": "1.17.0",
+  "minecraft:npc_dialogue": {
+    "scenes": [
+      {
+        "scene_tag": "chapter1_start",
+        "npc_name": "老賢者アルト",
+        "text": "若き冒険者よ、この地図を持っていくのじゃ。\n北の森の奥に、古代の遺跡が眠っておる...",
+        "on_open_commands": [
+          "/give @initiator filled_map"
+        ],
+        "buttons": [
+          {
+            "name": "受け取る",
+            "commands": [
+              "/tag @initiator add quest_started",
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§a地図を受け取った！\"}]}",
+              "/playsound random.levelup @initiator"
+            ]
+          },
+          {
+            "name": "断る",
+            "commands": [
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§7…また来るがよい\"}]}"
+            ]
+          }
+        ]
+      },
+      {
+        "scene_tag": "chapter2_start",
+        "npc_name": "老賢者アルト",
+        "text": "第二章：闇の森\n\nよくぞ秘宝を見つけた！次は闇の森の奥深くに眠る古代の祭壇を探すのじゃ。",
+        "buttons": [
+          {
+            "name": "続ける",
+            "commands": [
+              "/tag @initiator add quest_chapter2",
+              "/tag @initiator remove quest_chapter1",
+              "/title @initiator title §5第二章",
+              "/title @initiator subtitle §r闇の森",
+              "/playsound random.levelup @initiator"
+            ]
+          }
+        ]
+      },
+      {
+        "scene_tag": "chapter3_start",
+        "npc_name": "老賢者アルト",
+        "text": "第三章：最後の試練\n\n全ての秘宝が揃った。最後の試練を乗り越え、世界を救うのじゃ！",
+        "buttons": [
+          {
+            "name": "最終決戦へ",
+            "commands": [
+              "/tag @initiator add quest_chapter3",
+              "/tag @initiator remove quest_chapter2",
+              "/title @initiator title §c第三章",
+              "/title @initiator subtitle §r最後の試練",
+              "/playsound mob.enderdragon.growl @initiator"
+            ]
+          }
+        ]
+      },
+      {
+        "scene_tag": "ending",
+        "npc_name": "老賢者アルト",
+        "text": "おめでとう、勇者よ！\n\nお前は世界を闇から救った。この物語は永遠に語り継がれるじゃろう...",
+        "buttons": [
+          {
+            "name": "物語を終える",
+            "commands": [
+              "/title @initiator title §6§lおめでとう！",
+              "/title @initiator subtitle §r物語完結",
+              "/playsound ui.toast.challenge_complete @initiator",
+              "/tag @initiator add story_complete"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

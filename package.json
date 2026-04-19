@@ -1,0 +1,15 @@
+{
+  "name": "minecraft-story-addon",
+  "version": "1.0.0",
+  "description": "Koki's Minecraft Bedrock story addon",
+  "scripts": {
+    "validate": "node scripts/validate.js",
+    "check-uuids": "node scripts/check-uuids.js",
+    "pack": "node scripts/pack.js",
+    "release": "npm run validate && npm run pack",
+    "test": "node --test tests/"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.0"
+  }
+}

@@ -1,42 +1,56 @@
-# MineCraft - 物語アドオン
+# Arlt Story — Minecraft Bedrock アドオン
 
-マインクラフト Bedrock Edition 用のストーリー体験アドオンです。
+晄希（Koki）のためのマインクラフト物語アドオン。Nintendo Switch で遊べます。
+
+## PDCA ループ
+
+```
+🌙 夜：晄希がアイデアを音声入力 → Claude Code が実装・push
+🤖 GitHub Actions が自動で .mcaddon ビルド
+🏠 夕方：PC で Release DL → Realm アップロード → Switch で即プレイ
+```
 
 ## 構成
 
 ```
-MineCraft/
+src/
 ├── BP/                          # Behavior Pack
 │   ├── manifest.json
-│   ├── entities/
-│   │   └── story_npc.json       # NPCキャラクター
-│   ├── dialogue/
-│   │   ├── story_dialogue_1.json # 第一章ダイアログ
-│   │   ├── story_dialogue_2.json # 第二章ダイアログ
-│   │   └── story_dialogue_3.json # 第三章ダイアログ
-│   ├── items/
-│   │   └── story_item.json      # 古代の鍵
-│   ├── functions/
-│   │   ├── story_start.mcfunction         # 物語開始
-│   │   └── story_chapter_progress.mcfunction # チャプター進行
-│   └── texts/
-│       └── ja_JP.lang           # 日本語テキスト
+│   ├── dialogue/narrator.json   # NPC会話（老賢者アルト）
+│   ├── functions/story/         # mcfunction（物語進行）
+│   └── texts/ja_JP.lang         # ← 晄希が物語テキスト編集
 └── RP/                          # Resource Pack
     ├── manifest.json
-    ├── entity/
-    │   └── story_npc.entity.json # NPCクライアント定義
-    └── textures/
-        ├── items/               # アイテムテクスチャ
-        └── entity/              # エンティティテクスチャ
+    └── texts/
+scripts/                         # ビルド・リンク用スクリプト
+.github/workflows/               # CI: JSON検証 + 自動リリース
+docs/story/                      # ストーリー設計メモ
 ```
 
-## 使い方
+## クイックスタート
 
-1. `BP` フォルダを `com.mojang/development_behavior_packs/` にコピー
-2. `RP` フォルダを `com.mojang/development_resource_packs/` にコピー
-3. ワールド設定でアドオンを有効化
-4. ゲーム内で `/function story_start` を実行して物語を開始
+### PC 開発
+```powershell
+# シンボリックリンク作成（管理者 PowerShell）
+.\scripts\link-to-minecraft.ps1
+
+# ゲーム内で
+/function story/intro
+```
+
+### Switch で遊ぶ
+1. PC で Realm にワールドをアップロード
+2. Switch → Realms タブ → 参加（同じ Microsoft アカウント）
+
+### リリース作成
+```bash
+npm install
+npm run validate          # JSON 検証
+npm run pack              # .mcaddon ビルド
+git tag v1.0.0 && git push --tags   # → GitHub Actions が Release 作成
+```
 
 ## 動作要件
 
-- Minecraft Bedrock Edition 1.20.0 以上
+- Minecraft Bedrock Edition 1.21.0+
+- Nintendo Switch は Realms 経由で参加

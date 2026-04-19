@@ -1,0 +1,23 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Arlt Story",
+    "description": "Koki's first adventure",
+    "uuid": "d46eac87-e32a-483c-b3f5-6c027134e77c",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 0]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "f9189dce-5700-449c-8315-55a52d48d292",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "d68eb447-2711-4e8b-8258-840b149a9550",
+      "version": [1, 0, 0]
+    }
+  ]
+}
