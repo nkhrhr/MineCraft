@@ -1,0 +1,25 @@
+{
+  "name": "Koki's Note",
+  "short_name": "Koki's Note",
+  "description": "晄希の冒険アイデアノート",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#2b1d0e",
+  "theme_color": "#3e6b24",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "808x808",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "808x808",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
