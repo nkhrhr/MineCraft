@@ -8,6 +8,9 @@ entity.story:narrator.name=老賢者アルト
 item.story:ancient_key.name=§6古代の鍵
 item.story:treasure_gem.name=§b秘宝の宝石
 
+## 歓迎メッセージ
+welcome.title=ようこそ、冒険者よ！
+
 ## UI テキスト
 pack.name=Arlt Story
 pack.description=Koki's first adventure
