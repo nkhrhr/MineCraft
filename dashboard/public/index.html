@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Koki's Note</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- ヘッダー -->
+  <header id="header">
+    <div class="level-badge">
+      <span id="level-icon">⚔️</span>
+      <span>Lv.<span id="level">1</span></span>
+    </div>
+    <h1>Koki's Note</h1>
+    <div class="stats">
+      <span>📝 <span id="total-ideas">0</span></span>
+      <span>✅ <span id="total-done">0</span></span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- 左サイド: いまここステップ -->
+    <aside id="progress-rail">
+      <h3 class="rail-title">いまここ</h3>
+      <ol class="steps" id="steps">
+        <li class="step" data-step="1">
+          <span class="step-icon">✍️</span>
+          <div class="step-body">
+            <div class="step-title">アイデアを書く</div>
+            <div class="step-hint">思いついたことを送る</div>
+          </div>
+        </li>
+        <li class="step" data-step="2">
+          <span class="step-icon">🤖</span>
+          <div class="step-body">
+            <div class="step-title">hari が読む</div>
+            <div class="step-hint">30秒くらい</div>
+          </div>
+        </li>
+        <li class="step" data-step="3">
+          <span class="step-icon">🔨</span>
+          <div class="step-body">
+            <div class="step-title">Go! で作る</div>
+            <div class="step-hint">2〜5分</div>
+          </div>
+        </li>
+        <li class="step" data-step="4">
+          <span class="step-icon">📦</span>
+          <div class="step-body">
+            <div class="step-title">ビルドできた</div>
+            <div class="step-hint">3分くらい</div>
+          </div>
+        </li>
+        <li class="step" data-step="5">
+          <span class="step-icon">🎮</span>
+          <div class="step-body">
+            <div class="step-title">iPad で遊ぶ</div>
+            <div class="step-hint">タップで起動</div>
+          </div>
+        </li>
+      </ol>
+      <p id="rail-hint" class="rail-hint"></p>
+    </aside>
+
+    <!-- メイン -->
+    <main>
+      <!-- 新しいアイデアを書く -->
+      <section id="write-section" class="card">
+        <h2>💡 新しいアイデア</h2>
+        <input type="text" id="idea-title" placeholder="タイトル（例：ドラゴンを追加したい）" maxlength="80">
+        <textarea id="idea-body" rows="6" placeholder="どんなことをしたい？&#10;&#10;だれが出てくる？&#10;なにが起きる？&#10;ゲームの中でどうなる？"></textarea>
+        <button id="submit-btn" onclick="submitIdea()">📮 送る！</button>
+        <p id="submit-status" class="status-msg"></p>
+      </section>
+
+      <!-- hari との会話 -->
+      <section id="conversations" class="card">
+        <h2>💬 hari との会話</h2>
+        <div id="idea-list"></div>
+      </section>
+
+      <!-- 最新ビルド -->
+      <section id="build-section" class="card">
+        <h2>🎮 iPad で遊ぶ</h2>
+        <div id="build-info">読み込み中...</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- アイデア詳細モーダル -->
+  <div id="modal" class="modal" style="display:none">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2 id="modal-title"></h2>
+      <div id="modal-body"></div>
+      <div id="modal-chat"></div>
+      <div id="modal-reply" style="display:none">
+        <textarea id="reply-text" rows="3" placeholder="hari に返事を書く..."></textarea>
+        <div class="reply-buttons">
+          <button class="btn-go" onclick="sendReply('Go！')">👍 Go！</button>
+          <button class="btn-send" onclick="sendReply()">📤 送る</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

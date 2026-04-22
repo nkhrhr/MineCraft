@@ -9,6 +9,10 @@ dist/
 node_modules/
 package-lock.json
 
+# Cloudflare Wrangler
+.wrangler/
+.dev.vars
+
 # OS
 .DS_Store
 Thumbs.db

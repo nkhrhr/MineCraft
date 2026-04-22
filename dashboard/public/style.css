@@ -1,0 +1,546 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #2b1d0e;
+  --card: #3b2a14;
+  --card-border: #5a3a1a;
+  --grass: #5d8c3e;
+  --grass-dark: #3e6b24;
+  --dirt: #866043;
+  --stone: #7f7f7f;
+  --diamond: #5decf5;
+  --gold: #fcdb05;
+  --emerald: #17dd62;
+  --redstone: #d93a3a;
+  --text: #e8dcc8;
+  --text-dim: #a89478;
+  --radius: 4px;
+  --border: 3px solid var(--card-border);
+}
+
+body {
+  font-family: 'DotGothic16', monospace;
+  background: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px),
+    repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px);
+  color: var(--text);
+  min-height: 100dvh;
+  padding-bottom: 40px;
+  image-rendering: pixelated;
+}
+
+/* ヘッダー */
+header {
+  background: var(--grass-dark);
+  border-bottom: 4px solid var(--grass);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  flex: 1;
+  font-size: 1.2em;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.level-badge {
+  background: var(--gold);
+  color: #3b2a14;
+  padding: 4px 12px;
+  border: var(--border);
+  border-color: #d4a800;
+  font-weight: 700;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-shadow: none;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85em;
+  opacity: 0.9;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+/* レイアウト（左サイド + メイン） */
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 左サイド「いまここ」ステップレール */
+#progress-rail {
+  padding: 20px 12px;
+  border-right: 3px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.15);
+  min-height: calc(100dvh - 72px);
+  position: sticky;
+  top: 72px;
+  align-self: start;
+}
+
+.rail-title {
+  font-size: 0.9em;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 2px solid transparent;
+  background: rgba(0, 0, 0, 0.25);
+  opacity: 0.45;
+  position: relative;
+  transition: opacity 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.step + .step::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 22px;
+  width: 2px;
+  height: 8px;
+  background: var(--card-border);
+}
+
+.step-icon {
+  font-size: 1.4em;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.step-body { flex: 1; min-width: 0; }
+
+.step-title {
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+}
+
+.step-hint {
+  font-size: 0.7em;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* 完了したステップ */
+.step.done {
+  opacity: 0.85;
+  border-color: var(--grass-dark);
+}
+
+.step.done .step-icon::after {
+  content: '✓';
+  position: absolute;
+  right: 8px;
+  color: var(--emerald);
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* いまここ */
+.step.current {
+  opacity: 1;
+  background: rgba(252, 219, 5, 0.12);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.6);
+  animation: pulse-current 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-current {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.55); }
+  50% { box-shadow: 0 0 0 6px rgba(252, 219, 5, 0); }
+}
+
+/* 作業中（ローダー） */
+.step.current.loading .step-icon {
+  display: inline-block;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.rail-hint {
+  margin-top: 14px;
+  padding: 8px;
+  font-size: 0.75em;
+  color: var(--text-dim);
+  text-align: center;
+  min-height: 1.2em;
+  line-height: 1.4;
+}
+
+/* モバイル: 上に横置き */
+@media (max-width: 767px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  #progress-rail {
+    position: sticky;
+    top: 72px;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 3px solid var(--card-border);
+    padding: 10px;
+    z-index: 9;
+  }
+  .rail-title { margin-bottom: 8px; }
+  .steps {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 4px;
+  }
+  .step {
+    flex-direction: column;
+    min-width: 72px;
+    padding: 6px 4px;
+    text-align: center;
+  }
+  .step + .step::before { display: none; }
+  .step-icon { font-size: 1.2em; }
+  .step-title { font-size: 0.7em; letter-spacing: 0; }
+  .step-hint { display: none; }
+  .rail-hint { margin-top: 6px; font-size: 0.7em; }
+}
+
+/* カード */
+.card {
+  background: var(--card);
+  border: var(--border);
+  padding: 20px;
+  margin: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 4px 4px 0 rgba(0,0,0,0.3);
+}
+
+.card h2 {
+  font-size: 1em;
+  margin-bottom: 14px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+  letter-spacing: 1px;
+}
+
+/* 入力 */
+input[type="text"], textarea {
+  width: 100%;
+  background: #1a1008;
+  border: 3px solid var(--dirt);
+  padding: 10px;
+  color: var(--text);
+  font-size: 0.95em;
+  font-family: 'DotGothic16', monospace;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-dim);
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--emerald);
+}
+
+/* ボタン */
+button {
+  font-family: 'DotGothic16', monospace;
+  cursor: pointer;
+  border: none;
+  font-size: 1em;
+}
+
+#submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--grass);
+  border: 3px solid var(--grass-dark);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05em;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3);
+  transition: transform 0.05s;
+}
+
+#submit-btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.2), 1px 1px 0 rgba(0,0,0,0.3);
+}
+
+#submit-btn:disabled { opacity: 0.5; }
+
+.status-msg {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 0.85em;
+  min-height: 1.2em;
+}
+
+/* アイデアリスト */
+.idea-item {
+  background: rgba(0,0,0,0.2);
+  border: 2px solid var(--card-border);
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.1s;
+}
+
+.idea-item:active { background: rgba(0,0,0,0.4); }
+
+.idea-status { font-size: 1.3em; flex-shrink: 0; }
+.idea-info { flex: 1; min-width: 0; }
+
+.idea-info h3 {
+  font-size: 0.9em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.idea-info .date {
+  font-size: 0.75em;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ビルド */
+.build-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-family: 'DotGothic16', monospace;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  margin-top: 10px;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+  border: 3px solid;
+  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3);
+  transition: transform 0.05s;
+}
+
+.build-btn:active {
+  transform: translateY(2px);
+}
+
+.build-btn.mcworld {
+  background: var(--emerald);
+  border-color: #0fa84a;
+  color: #1a1008;
+}
+
+/* メインの「iPad で遊ぶ」ボタンは一段大きく */
+.build-btn.play {
+  font-size: 1.3em;
+  padding: 22px 12px;
+  letter-spacing: 2px;
+  background: linear-gradient(180deg, #6dd989 0%, var(--emerald) 100%);
+  border-color: #0fa84a;
+  color: #1a1008;
+  animation: play-ready 2.2s ease-in-out infinite;
+}
+
+.build-btn.play .sub {
+  display: block;
+  font-size: 0.55em;
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  color: #1a3808;
+  text-shadow: none;
+}
+
+@keyframes play-ready {
+  0%, 100% { box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3), 0 0 0 0 rgba(23, 221, 98, 0.5); }
+  50% { box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3), 0 0 0 8px rgba(23, 221, 98, 0); }
+}
+
+.build-btn.mcaddon {
+  background: var(--diamond);
+  border-color: #3ab8c8;
+  color: #1a1008;
+  font-size: 0.85em;
+  padding: 8px;
+  opacity: 0.85;
+}
+
+.build-version {
+  text-align: center;
+  font-size: 0.8em;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+/* モーダル */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-content {
+  background: var(--card);
+  border: var(--border);
+  border-bottom: none;
+  padding: 24px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85dvh;
+  overflow-y: auto;
+}
+
+.modal-close {
+  float: right;
+  background: var(--redstone);
+  border: 2px solid #a82a2a;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  font-size: 0.85em;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+}
+
+#modal-title {
+  font-size: 1.1em;
+  margin-bottom: 12px;
+  padding-right: 40px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+}
+
+#modal-body {
+  font-size: 0.85em;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  background: rgba(0,0,0,0.2);
+  padding: 10px;
+  border: 2px solid rgba(255,255,255,0.05);
+}
+
+/* チャット */
+.chat-bubble {
+  border: 2px solid;
+  padding: 12px;
+  margin-bottom: 8px;
+  font-size: 0.85em;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.chat-hari {
+  background: rgba(93,140,62,0.15);
+  border-color: var(--grass-dark);
+  margin-right: 16px;
+}
+
+.chat-hari::before {
+  content: '🤖 hari';
+  display: block;
+  font-weight: 700;
+  font-size: 0.8em;
+  margin-bottom: 4px;
+  color: var(--emerald);
+}
+
+.chat-koki {
+  background: rgba(252,219,5,0.1);
+  border-color: #d4a800;
+  margin-left: 16px;
+}
+
+.chat-koki::before {
+  content: '⛏️ じぶん';
+  display: block;
+  font-weight: 700;
+  font-size: 0.8em;
+  margin-bottom: 4px;
+  color: var(--gold);
+}
+
+/* 返信 */
+#modal-reply {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid var(--card-border);
+}
+
+.reply-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-go {
+  flex: 1;
+  padding: 10px;
+  background: var(--emerald);
+  border: 3px solid #0fa84a;
+  color: #1a1008;
+  font-weight: 700;
+  font-family: 'DotGothic16', monospace;
+  text-shadow: none;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
+}
+
+.btn-send {
+  flex: 1;
+  padding: 10px;
+  background: var(--diamond);
+  border: 3px solid #3ab8c8;
+  color: #1a1008;
+  font-weight: 700;
+  font-family: 'DotGothic16', monospace;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
+}
+
+/* 空 */
+.empty {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 20px;
+  font-size: 0.85em;
+}

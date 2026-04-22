@@ -203,8 +203,40 @@ ${currentState}
 
   if (prRes.status === 201) {
     console.log(`✅ PR 作成: ${prRes.data.html_url}`);
+    const prNumber = prRes.data.number;
+
+    // PR を即マージ（squash）→ master に push → Build Release ワークフロー発火
+    const mergeRes = await httpRequest({
+      hostname: 'api.github.com',
+      path: `/repos/${REPO}/pulls/${prNumber}/merge`,
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(JSON.stringify({
+          merge_method: 'squash',
+          commit_title: `${commitMsg}`
+        })),
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'ArltStory-Bot',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }, JSON.stringify({
+      merge_method: 'squash',
+      commit_title: `${commitMsg}`
+    }));
+
+    const merged = mergeRes.status === 200;
+    if (merged) {
+      console.log(`✅ PR 自動マージ完了 → ビルド開始`);
+    } else {
+      console.error(`⚠️ 自動マージ失敗 (${mergeRes.status}):`, JSON.stringify(mergeRes.data));
+    }
 
     // Issue にコメント
+    const commentBody = merged
+      ? `できたよ！マージしたから、あと数分でビルドが出るよ📦\n\n変更したファイル:\n${changedFiles.map(f => '- \`' + f + '\`').join('\n')}`
+      : `実装できたよ！ PR はここ → ${prRes.data.html_url}\n（自動マージに失敗したから、お父さんに確認してもらってね）\n\n変更したファイル:\n${changedFiles.map(f => '- \`' + f + '\`').join('\n')}`;
+
     await httpRequest({
       hostname: 'api.github.com',
       path: `/repos/${REPO}/issues/${ISSUE_NUMBER}/comments`,
@@ -215,9 +247,7 @@ ${currentState}
         'User-Agent': 'ArltStory-Bot',
         'Accept': 'application/vnd.github.v3+json'
       }
-    }, JSON.stringify({
-      body: `実装できたよ！ PR はここ → ${prRes.data.html_url}\n\n変更したファイル:\n${changedFiles.map(f => '- `' + f + '`').join('\n')}`
-    }));
+    }, JSON.stringify({ body: commentBody }));
   } else {
     console.error('PR creation error:', JSON.stringify(prRes.data));
     process.exit(1);

@@ -1,14 +1,26 @@
-name: Nightly Build
+name: Build Release
 
+# トリガー:
+#  - master への push（PR マージで即発火）
+#  - 手動実行（ダッシュボードから叩く用）
+#  - 週1 日曜深夜の安全網（万一 push を逃しても最新ビルドが残る）
 on:
   push:
     branches: [master]
+  workflow_dispatch:
   schedule:
-    - cron: '0 15 * * *'  # 毎日 00:00 JST
+    - cron: '0 15 * * 0'  # 毎週日曜 00:00 JST
+
+# 同じ master への連続 push は新しいビルドで古いビルドを打ち切る
+concurrency:
+  group: build-release-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -33,10 +45,10 @@ jobs:
       - name: Create .mcworld
         run: node scripts/create-world.js
 
-      - name: Upload nightly release
+      - name: Upload release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: nightly-${{ env.NEW_VERSION }}
+          tag_name: build-${{ env.NEW_VERSION }}
           name: "v${{ env.NEW_VERSION }}"
           files: |
             dist/*.mcworld

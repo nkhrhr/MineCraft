@@ -115,8 +115,9 @@ chore: バージョン 1.1.0 に更新
 
 ## リリースフロー
 
-### 自動（nightly）
-master に push → 毎晩 0時 JST に GitHub Actions が自動ビルド → prerelease 作成
+### 自動（即時ビルド）
+master に push（PR マージで発火）→ `Build Release` ワークフローが即ビルド → prerelease 作成。
+週1日曜の安全網スケジュールと、ダッシュボードからの手動 `workflow_dispatch` もあり。
 
 ### 手動（正式リリース）
 ```bash
@@ -132,8 +133,8 @@ git push origin master --tags
 | ワークフロー | トリガー | 処理 |
 |---|---|---|
 | `interpret-idea.yml` | Issue 作成（label: story） | Claude がアイデアを構造化してコメント |
-| `implement-idea.yml` | "Go" コメント | Claude が実装 → PR 作成 |
-| `nightly-build.yml` | 毎日 0時 JST / master push | .mcworld + .mcaddon ビルド → Release |
+| `implement-idea.yml` | "Go" コメント | Claude が実装 → PR 作成 → 自動マージ |
+| `nightly-build.yml` (Build Release) | master push / 手動 / 週1日曜 | .mcworld + .mcaddon 即ビルド → Release |
 | `validate.yml` | push / PR | JSON 検証 |
 | `release.yml` | タグ push (v*) | 正式 Release 作成 |
 

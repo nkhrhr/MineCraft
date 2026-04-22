@@ -1,0 +1,15 @@
+name = "koki-designing"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+[assets]
+directory = "public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "koki-adventure-db"
+database_id = "9397bff9-5ae7-47ea-9289-93fb8e16de5f"
+
+[vars]
+GITHUB_REPO = "nkhrhr/MineCraft"
