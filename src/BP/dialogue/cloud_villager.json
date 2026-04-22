@@ -1,0 +1,76 @@
+{
+  "format_version": "1.17.0",
+  "minecraft:npc_dialogue": {
+    "scenes": [
+      {
+        "scene_tag": "cloud_greeting",
+        "npc_name": "雲の村人",
+        "text": "おや！久しぶりに地上から来た人だ！\n\nここは雲の上の秘密の村。空飛ぶ馬に乗ってよく来れたね。",
+        "buttons": [
+          {
+            "name": "この村について教えて",
+            "commands": [
+              "/dialogue change @s cloud_about_village @initiator"
+            ]
+          },
+          {
+            "name": "��か特別なものはある？",
+            "commands": [
+              "/dialogue change @s cloud_special_item @initiator"
+            ]
+          },
+          {
+            "name": "さよなら",
+            "commands": [
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§b雲の村人：§r また遊びに来てね！\"}]}"
+            ]
+          }
+        ]
+      },
+      {
+        "scene_tag": "cloud_about_village",
+        "npc_name": "雲の村人",
+        "text": "この村は昔から雲の上にあるんだ。\n\n普通の人は来られないから、とても静かで平和なところだよ。雲の下の世界とは違う生活をしているんだ。",
+        "buttons": [
+          {
+            "name": "素晴らしいね",
+            "commands": [
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§b雲の村人：§r そうでしょう！君も気に入ってくれて嬉しいよ。\"}]}",
+              "/dialogue change @s cloud_greeting @initiator"
+            ]
+          },
+          {
+            "name": "戻る",
+            "commands": [
+              "/dialogue change @s cloud_greeting @initiator"
+            ]
+          }
+        ]
+      },
+      {
+        "scene_tag": "cloud_special_item",
+        "npc_name": "雲の村人",
+        "text": "特別なもの？そうだね...\n\n雲のかけらをあげよう！これは雲の上でしか手に入らない貴重なものなんだよ。",
+        "on_open_commands": [
+          "/give @initiator snowball 3"
+        ],
+        "buttons": [
+          {
+            "name": "ありがとう！",
+            "commands": [
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§a雲のかけら x3 を受け取った！\"}]}",
+              "/playsound random.levelup @initiator",
+              "/dialogue change @s cloud_greeting @initiator"
+            ]
+          },
+          {
+            "name": "戻る",
+            "commands": [
+              "/dialogue change @s cloud_greeting @initiator"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
