@@ -184,7 +184,26 @@ ${currentState}
   try {
     execSync(`git push origin HEAD:master`);
     pushed = true;
-    console.log(`✅ master に直接コミット & push → Build Release 発火`);
+    console.log(`✅ master に直接コミット & push`);
+
+    // GITHUB_TOKEN で push した commit は push イベントを他ワークフローに伝播しない
+    // （GitHub の無限ループ防止仕様）ため、Build Release を明示的に起動する
+    const dispatchRes = await httpRequest({
+      hostname: 'api.github.com',
+      path: `/repos/${REPO}/actions/workflows/nightly-build.yml/dispatches`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'ArltStory-Bot',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }, JSON.stringify({ ref: 'master' }));
+    if (dispatchRes.status === 204) {
+      console.log(`✅ Build Release を起動しました`);
+    } else {
+      console.error(`⚠️ Build Release 起動失敗 (${dispatchRes.status}):`, JSON.stringify(dispatchRes.data));
+    }
   } catch (e) {
     // 失敗時のフォールバック: 作業ブランチに push しておいて人に見える状態にする
     const branch = `story/issue-${ISSUE_NUMBER}`;
