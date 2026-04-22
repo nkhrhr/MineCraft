@@ -156,6 +156,76 @@ header h1 {
   min-height: 2.4em;
 }
 
+/* プログレスバー */
+.progress-bar {
+  margin-top: 16px;
+  padding: 0 4px;
+  position: relative;
+}
+
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: 16px;
+  right: 16px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--card-border);
+}
+
+.progress-fill {
+  position: absolute;
+  top: 11px;
+  left: 16px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--grass) 0%, var(--emerald) 100%);
+  border: 1px solid var(--grass-dark);
+  transition: width 0.6s ease;
+  max-width: calc(100% - 32px);
+}
+
+.progress-ticks {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.tick {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85em;
+  opacity: 0.4;
+  transition: opacity 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+  z-index: 1;
+}
+
+.tick.done {
+  opacity: 1;
+  border-color: var(--grass-dark);
+  background: var(--grass);
+}
+
+.tick.current {
+  opacity: 1;
+  border-color: var(--gold);
+  background: rgba(252, 219, 5, 0.2);
+  transform: scale(1.2);
+  box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.55);
+  animation: pulse-tick 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-tick {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.55); }
+  50% { box-shadow: 0 0 0 6px rgba(252, 219, 5, 0); }
+}
+
 /* モバイル: 上に横置き（コンパクト） */
 @media (max-width: 767px) {
   .layout {

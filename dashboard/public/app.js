@@ -67,6 +67,26 @@ function renderProgress(p) {
   avatar.textContent = avatarIcon;
   name.textContent = actorName;
   action.textContent = msg;
+
+  // プログレスバー
+  const bar = document.getElementById('progress-bar');
+  const fill = document.getElementById('progress-fill');
+  bar.dataset.step = p.step;
+  // 5 段階: step 1→0%, 2→25%, 3→50%, 4→75%, 5→100%
+  const pct = ((p.step - 1) / 4) * 100;
+  fill.style.width = pct + '%';
+  document.querySelectorAll('.tick').forEach(t => {
+    const s = Number(t.dataset.step);
+    t.classList.toggle('done', s < p.step);
+    t.classList.toggle('current', s === p.step);
+  });
+
+  // 新しいアイデアを書けるのは step 1（まだアイデアなし）と step 5（完成）のときだけ。
+  // それ以外（hari 作業中 / Go 待ち）は write-section を隠して混乱を防ぐ。
+  const writeSection = document.getElementById('write-section');
+  if (writeSection) {
+    writeSection.style.display = (p.step === 1 || p.step === 5) ? '' : 'none';
+  }
 }
 
 // Build Release が出たら進行中のステップを即反映
