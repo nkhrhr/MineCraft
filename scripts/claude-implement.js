@@ -174,24 +174,33 @@ ${currentState}
     process.exit(1);
   }
 
-  // ブランチ作成 → コミット → PR
-  const branch = `story/issue-${ISSUE_NUMBER}`;
-  execSync(`git checkout -b ${branch}`);
+  // master に直接コミット → push （PR なし。Build Release が即発火）
+  // 理由: GitHub Actions のデフォルト権限では PR 作成ができない（403）ため、
+  //       そもそも PR を作らず master に直 push する方が早く・確実・シンプル。
   execSync(`git add ${changedFiles.join(' ')}`);
   execSync(`git commit -m "${commitMsg.replace(/"/g, '\\"')}"`);
-  execSync(`git push origin ${branch}`);
 
-  // PR 作成
-  const prBody = JSON.stringify({
-    title: `${issue.title} (#${ISSUE_NUMBER})`,
-    body: `## 晄希のアイデア\n${issue.body}\n\n## 変更ファイル\n${changedFiles.map(f => '- ' + f).join('\n')}\n\nCloses #${ISSUE_NUMBER}`,
-    head: branch,
-    base: 'master'
-  });
+  let pushed = false;
+  try {
+    execSync(`git push origin HEAD:master`);
+    pushed = true;
+    console.log(`✅ master に直接コミット & push → Build Release 発火`);
+  } catch (e) {
+    // 失敗時のフォールバック: 作業ブランチに push しておいて人に見える状態にする
+    const branch = `story/issue-${ISSUE_NUMBER}`;
+    console.error(`⚠️ master への直 push 失敗、${branch} に退避します`);
+    execSync(`git checkout -b ${branch}`);
+    execSync(`git push origin ${branch}`);
+  }
 
-  const prRes = await httpRequest({
+  // Issue にコメント
+  const commentBody = pushed
+    ? `できたよ！master にコミットしたから、あと数分でビルドが出るよ📦\n\n変更したファイル:\n${changedFiles.map(f => '- \`' + f + '\`').join('\n')}`
+    : `実装できたけど master に push できなかったよ💦 お父さんに \`story/issue-${ISSUE_NUMBER}\` ブランチを見てもらってね。\n\n変更したファイル:\n${changedFiles.map(f => '- \`' + f + '\`').join('\n')}`;
+
+  await httpRequest({
     hostname: 'api.github.com',
-    path: `/repos/${REPO}/pulls`,
+    path: `/repos/${REPO}/issues/${ISSUE_NUMBER}/comments`,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -199,58 +208,22 @@ ${currentState}
       'User-Agent': 'ArltStory-Bot',
       'Accept': 'application/vnd.github.v3+json'
     }
-  }, prBody);
+  }, JSON.stringify({ body: commentBody }));
 
-  if (prRes.status === 201) {
-    console.log(`✅ PR 作成: ${prRes.data.html_url}`);
-    const prNumber = prRes.data.number;
-
-    // PR を即マージ（squash）→ master に push → Build Release ワークフロー発火
-    const mergeRes = await httpRequest({
-      hostname: 'api.github.com',
-      path: `/repos/${REPO}/pulls/${prNumber}/merge`,
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(JSON.stringify({
-          merge_method: 'squash',
-          commit_title: `${commitMsg}`
-        })),
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'User-Agent': 'ArltStory-Bot',
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    }, JSON.stringify({
-      merge_method: 'squash',
-      commit_title: `${commitMsg}`
-    }));
-
-    const merged = mergeRes.status === 200;
-    if (merged) {
-      console.log(`✅ PR 自動マージ完了 → ビルド開始`);
-    } else {
-      console.error(`⚠️ 自動マージ失敗 (${mergeRes.status}):`, JSON.stringify(mergeRes.data));
-    }
-
-    // Issue にコメント
-    const commentBody = merged
-      ? `できたよ！マージしたから、あと数分でビルドが出るよ📦\n\n変更したファイル:\n${changedFiles.map(f => '- \`' + f + '\`').join('\n')}`
-      : `実装できたよ！ PR はここ → ${prRes.data.html_url}\n（自動マージに失敗したから、お父さんに確認してもらってね）\n\n変更したファイル:\n${changedFiles.map(f => '- \`' + f + '\`').join('\n')}`;
-
+  // push 成功時は Issue をクローズ（Closes #N だけだと master マージトリガーが
+  // 使えない＝ 直 push では close されないため、明示的にクローズ）
+  if (pushed) {
     await httpRequest({
       hostname: 'api.github.com',
-      path: `/repos/${REPO}/issues/${ISSUE_NUMBER}/comments`,
-      method: 'POST',
+      path: `/repos/${REPO}/issues/${ISSUE_NUMBER}`,
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${GITHUB_TOKEN}`,
         'User-Agent': 'ArltStory-Bot',
         'Accept': 'application/vnd.github.v3+json'
       }
-    }, JSON.stringify({ body: commentBody }));
-  } else {
-    console.error('PR creation error:', JSON.stringify(prRes.data));
-    process.exit(1);
+    }, JSON.stringify({ state: 'closed' }));
   }
 }
 
