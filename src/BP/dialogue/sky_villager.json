@@ -1,0 +1,36 @@
+{
+  "format_version": "1.17.0",
+  "minecraft:npc_dialogue": {
+    "scenes": [
+      {
+        "scene_tag": "sky_greeting",
+        "npc_name": "雲の村人",
+        "text": "おや！まさか空飛ぶ馬でここまで来たのですか！\n\nようこそ、雲の上の秘密の村へ！ここは選ばれた冒険者だけが辿り着ける特別な場所なのです。",
+        "buttons": [
+          {
+            "name": "この村について教えて",
+            "commands": [
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§b雲の村人：§rこの村は古代から雲の上に浮かんでいます。空飛ぶ馬と心を通わせた者だけがここに来ることができるのです。\"}]}",
+              "/playsound random.pop @initiator"
+            ]
+          },
+          {
+            "name": "贈り物をもらう",
+            "commands": [
+              "/give @initiator diamond 3",
+              "/give @initiator bread 5",
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§a雲の村からの贈り物を受け取った！\"}]}",
+              "/playsound random.levelup @initiator"
+            ]
+          },
+          {
+            "name": "また来ます",
+            "commands": [
+              "/tellraw @initiator {\"rawtext\":[{\"text\":\"§b雲の村人：§rいつでも待っています！空飛ぶ馬を大切にしてくださいね。\"}]}"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
