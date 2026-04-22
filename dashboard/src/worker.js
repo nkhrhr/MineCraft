@@ -194,9 +194,34 @@ async function handleAPI(url, request, env) {
     // GET /api/progress — いま晄希がどのステップにいるか（左サイドバー用）
     if (url.pathname === '/api/progress' && request.method === 'GET') {
       // 最新のアイデアを取得
-      const idea = await env.DB.prepare(
+      let idea = await env.DB.prepare(
         'SELECT * FROM ideas ORDER BY created_at DESC LIMIT 1'
       ).first();
+
+      // 最新アイデアが waiting の間、GitHub のコメント状況を見て status を自動更新
+      // （晄希がモーダルを開かなくてもステップが進むようにする）
+      if (idea && idea.status === 'waiting') {
+        const commentsRes = await fetch(
+          `https://api.github.com/repos/${env.GITHUB_REPO}/issues/${idea.github_issue_number}/comments`,
+          {
+            headers: {
+              'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
+              'User-Agent': 'KokiAdventureNote',
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          }
+        );
+        if (commentsRes.ok) {
+          const comments = await commentsRes.json();
+          const hari = comments.find(c => c.user.login === 'github-actions[bot]' || c.user.type === 'Bot');
+          if (hari) {
+            await env.DB.prepare(
+              'UPDATE ideas SET hari_response = ?, status = "responded" WHERE github_issue_number = ?'
+            ).bind(hari.body, idea.github_issue_number).run();
+            idea = { ...idea, status: 'responded', hari_response: hari.body };
+          }
+        }
+      }
 
       // 最新のビルド
       const relRes = await fetch(
