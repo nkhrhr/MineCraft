@@ -83,9 +83,9 @@ header h1 {
   margin: 0 auto;
 }
 
-/* 左サイド「いまここ」ステップレール */
+/* 左サイド「いま作業中」カード */
 #progress-rail {
-  padding: 20px 12px;
+  padding: 20px 16px;
   border-right: 3px solid var(--card-border);
   background: rgba(0, 0, 0, 0.15);
   min-height: calc(100dvh - 72px);
@@ -103,90 +103,34 @@ header h1 {
   margin-bottom: 16px;
 }
 
-.steps {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border: 2px solid transparent;
-  background: rgba(0, 0, 0, 0.25);
-  opacity: 0.45;
-  position: relative;
-  transition: opacity 0.2s, border-color 0.2s, background 0.2s;
-}
-
-.step + .step::before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 22px;
-  width: 2px;
-  height: 8px;
-  background: var(--card-border);
-}
-
-.step-icon {
-  font-size: 1.4em;
-  width: 28px;
+.actor-card {
+  border: 3px solid var(--card-border);
+  background: var(--card);
+  padding: 20px 12px;
   text-align: center;
-  flex-shrink: 0;
+  transition: border-color 0.3s, background 0.3s;
 }
 
-.step-body { flex: 1; min-width: 0; }
-
-.step-title {
-  font-size: 0.85em;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+.actor-card[data-actor="hari"] {
+  border-color: var(--emerald);
+  background: rgba(23, 221, 98, 0.08);
 }
 
-.step-hint {
-  font-size: 0.7em;
-  color: var(--text-dim);
-  margin-top: 2px;
-}
-
-/* 完了したステップ */
-.step.done {
-  opacity: 0.85;
-  border-color: var(--grass-dark);
-}
-
-.step.done .step-icon::after {
-  content: '✓';
-  position: absolute;
-  right: 8px;
-  color: var(--emerald);
-  font-weight: 700;
-  font-size: 1.1em;
-}
-
-/* いまここ */
-.step.current {
-  opacity: 1;
-  background: rgba(252, 219, 5, 0.12);
+.actor-card[data-actor="koki"] {
   border-color: var(--gold);
-  box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.6);
-  animation: pulse-current 1.6s ease-in-out infinite;
+  background: rgba(252, 219, 5, 0.08);
 }
 
-@keyframes pulse-current {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.55); }
-  50% { box-shadow: 0 0 0 6px rgba(252, 219, 5, 0); }
-}
-
-/* 作業中（ローダー） */
-.step.current.loading .step-icon {
+.actor-avatar {
+  font-size: 3em;
+  line-height: 1;
+  margin-bottom: 10px;
   display: inline-block;
-  animation: spin 1.2s linear infinite;
+}
+
+/* hari が作業中のときだけアバターが回る */
+.actor-card[data-working="true"] .actor-avatar {
+  animation: spin 1.5s linear infinite;
 }
 
 @keyframes spin {
@@ -194,17 +138,25 @@ header h1 {
   to { transform: rotate(360deg); }
 }
 
-.rail-hint {
-  margin-top: 14px;
-  padding: 8px;
-  font-size: 0.75em;
-  color: var(--text-dim);
-  text-align: center;
-  min-height: 1.2em;
-  line-height: 1.4;
+.actor-name {
+  font-size: 1em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  margin-bottom: 6px;
 }
 
-/* モバイル: 上に横置き */
+.actor-card[data-actor="hari"] .actor-name { color: var(--emerald); }
+.actor-card[data-actor="koki"] .actor-name { color: var(--gold); }
+
+.actor-action {
+  font-size: 0.8em;
+  color: var(--text-dim);
+  line-height: 1.5;
+  min-height: 2.4em;
+}
+
+/* モバイル: 上に横置き（コンパクト） */
 @media (max-width: 767px) {
   .layout {
     grid-template-columns: 1fr;
@@ -215,26 +167,20 @@ header h1 {
     min-height: auto;
     border-right: none;
     border-bottom: 3px solid var(--card-border);
-    padding: 10px;
+    padding: 8px 10px;
     z-index: 9;
   }
-  .rail-title { margin-bottom: 8px; }
-  .steps {
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 4px;
+  .rail-title { display: none; }
+  .actor-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    text-align: left;
   }
-  .step {
-    flex-direction: column;
-    min-width: 72px;
-    padding: 6px 4px;
-    text-align: center;
-  }
-  .step + .step::before { display: none; }
-  .step-icon { font-size: 1.2em; }
-  .step-title { font-size: 0.7em; letter-spacing: 0; }
-  .step-hint { display: none; }
-  .rail-hint { margin-top: 6px; font-size: 0.7em; }
+  .actor-avatar { font-size: 2em; margin-bottom: 0; }
+  .actor-name { margin-bottom: 2px; font-size: 0.9em; }
+  .actor-action { font-size: 0.75em; min-height: 1.2em; }
 }
 
 /* カード */

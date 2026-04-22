@@ -28,27 +28,45 @@ async function loadProgress() {
 }
 
 function renderProgress(p) {
-  const steps = document.querySelectorAll('#steps .step');
-  const hint = document.getElementById('rail-hint');
+  const card = document.getElementById('actor-card');
+  const avatar = document.getElementById('actor-avatar');
+  const name = document.getElementById('actor-name');
+  const action = document.getElementById('actor-action');
 
-  steps.forEach(el => {
-    const s = Number(el.dataset.step);
-    el.classList.remove('done', 'current', 'loading');
-    if (s < p.step) el.classList.add('done');
-    if (s === p.step) {
-      el.classList.add('current');
-      if (p.loading) el.classList.add('loading');
-    }
-  });
+  // step と loading から「誰が」「何をしてる」を決める
+  // step 1: 晄希が書く (idle)
+  // step 2 + loading: hari が読んでる (working)
+  // step 2 + !loading: 晄希の返事待ち
+  // step 3: hari が作ってる (working)
+  // step 4: hari がビルド中 (working)
+  // step 5: 晄希が遊べる
+  let actor, avatarIcon, actorName, msg, working;
 
-  const hints = {
-    1: 'あたらしいアイデアを書こう！',
-    2: p.loading ? 'hari が読んでるよ...' : 'hari の返事を読んで「Go！」を押そう',
-    3: 'hari が作ってるよ！ あとちょっと',
-    4: 'ビルド中... もうすぐ遊べるよ',
-    5: '⬇️ 下のみどりボタンで遊ぼう！'
-  };
-  hint.textContent = hints[p.step] || '';
+  if (p.step === 1) {
+    actor = 'koki'; avatarIcon = '⛏️'; actorName = '晄希';
+    msg = 'アイデアを書いてね'; working = false;
+  } else if (p.step === 2 && p.loading) {
+    actor = 'hari'; avatarIcon = '🤖'; actorName = 'hari';
+    msg = 'アイデアを読んでるよ...'; working = true;
+  } else if (p.step === 2) {
+    actor = 'koki'; avatarIcon = '⛏️'; actorName = '晄希';
+    msg = 'hari の返事を読んで Go！を押そう'; working = false;
+  } else if (p.step === 3) {
+    actor = 'hari'; avatarIcon = '🔨'; actorName = 'hari';
+    msg = '作ってるよ！ あとちょっと'; working = true;
+  } else if (p.step === 4) {
+    actor = 'hari'; avatarIcon = '📦'; actorName = 'hari';
+    msg = 'ビルド中...'; working = true;
+  } else {
+    actor = 'koki'; avatarIcon = '🎮'; actorName = '晄希';
+    msg = '遊べるよ！ ⬇️ のボタンで起動'; working = false;
+  }
+
+  card.dataset.actor = actor;
+  card.dataset.working = working;
+  avatar.textContent = avatarIcon;
+  name.textContent = actorName;
+  action.textContent = msg;
 }
 
 // Build Release が出たら進行中のステップを即反映

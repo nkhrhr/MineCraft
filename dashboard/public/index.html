@@ -36,47 +36,14 @@
   </header>
 
   <div class="layout">
-    <!-- 左サイド: いまここステップ -->
+    <!-- 左サイド: いま作業中のひと -->
     <aside id="progress-rail">
-      <h3 class="rail-title">いまここ</h3>
-      <ol class="steps" id="steps">
-        <li class="step" data-step="1">
-          <span class="step-icon">✍️</span>
-          <div class="step-body">
-            <div class="step-title">アイデアを書く</div>
-            <div class="step-hint">思いついたことを送る</div>
-          </div>
-        </li>
-        <li class="step" data-step="2">
-          <span class="step-icon">🤖</span>
-          <div class="step-body">
-            <div class="step-title">hari が読む</div>
-            <div class="step-hint">30秒くらい</div>
-          </div>
-        </li>
-        <li class="step" data-step="3">
-          <span class="step-icon">🔨</span>
-          <div class="step-body">
-            <div class="step-title">Go! で作る</div>
-            <div class="step-hint">2〜5分</div>
-          </div>
-        </li>
-        <li class="step" data-step="4">
-          <span class="step-icon">📦</span>
-          <div class="step-body">
-            <div class="step-title">ビルドできた</div>
-            <div class="step-hint">3分くらい</div>
-          </div>
-        </li>
-        <li class="step" data-step="5">
-          <span class="step-icon">🎮</span>
-          <div class="step-body">
-            <div class="step-title">iPad で遊ぶ</div>
-            <div class="step-hint">タップで起動</div>
-          </div>
-        </li>
-      </ol>
-      <p id="rail-hint" class="rail-hint"></p>
+      <h3 class="rail-title">いま作業中</h3>
+      <div class="actor-card" id="actor-card" data-actor="koki" data-working="false">
+        <div class="actor-avatar" id="actor-avatar">⛏️</div>
+        <div class="actor-name" id="actor-name">晄希</div>
+        <div class="actor-action" id="actor-action">アイデアを書いてね</div>
+      </div>
     </aside>
 
     <!-- メイン -->
