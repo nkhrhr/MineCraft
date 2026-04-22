@@ -3,18 +3,11 @@
 
 ## エンティティ名
 entity.story:narrator.name=老賢者アルト
-entity.story:flying_horse.name=空飛ぶ馬
-entity.story:cloud_villager.name=雲の村人
 
 ## アイテム名
 item.story:ancient_key.name=§6古代の鍵
 item.story:treasure_gem.name=§b秘宝の宝石
-item.story:cloud_fragment.name=§f雲のかけら
 
 ## UI テキスト
 pack.name=Arlt Story
 pack.description=Koki's first adventure
-
-## インタラ��ション
-action.interact.ride=乗る
-action.interact.talk=話しかける
