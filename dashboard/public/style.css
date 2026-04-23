@@ -20,7 +20,24 @@
   --shadow: 0 28px 70px rgba(81, 56, 28, 0.14);
   --shadow-soft: 0 18px 40px rgba(81, 56, 28, 0.1);
   --radius: 26px;
-  --avatar-size: 34px;
+  --avatar-size: 40px;
+  --page-max: 1220px;
+  --pad-card: 28px;
+  --pad-card-mobile: 22px;
+  --pad-header-y: 28px;
+  --pad-header-x: 30px;
+  --space-1: 6px;
+  --space-2: 8px;
+  --space-3: 10px;
+  --space-4: 12px;
+  --space-5: 14px;
+  --space-6: 16px;
+  --space-7: 20px;
+  --space-8: 24px;
+  --space-9: 28px;
+  --pad-page: 24px;
+  --pad-page-tablet: 18px;
+  --pad-page-mobile: 14px;
 }
 
 * {
@@ -47,7 +64,7 @@ body {
   font-family: var(--font-ui);
   color: var(--ink);
   min-height: 100dvh;
-  padding: 24px;
+  padding: var(--pad-page);
   line-height: 1.7;
   background:
     radial-gradient(circle at top left, rgba(255, 245, 221, 0.9), transparent 36%),
@@ -80,10 +97,38 @@ body::before {
 }
 
 header {
-  max-width: 1240px;
-  margin: 0 auto 28px;
-  padding: 28px 30px;
+  width: min(100%, var(--page-max));
+  margin: 0 auto var(--space-9);
+  padding: var(--pad-header-y) var(--pad-header-x);
   color: var(--ink);
+}
+
+.dashboard-grid {
+  width: min(100%, var(--page-max));
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-8);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
 }
 
 .brand {
@@ -92,14 +137,14 @@ header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
 }
 
 .brand-icon {
-  width: 72px;
-  height: 72px;
-  margin-top: 4px;
+  width: clamp(64px, 9vw, 86px);
+  height: clamp(64px, 9vw, 86px);
+  margin-top: 2px;
   /* iOS 風スクワークル: アイコンサイズの約 22% が iOS の squircle 近似 */
   border-radius: 22.37%;
   flex-shrink: 0;
@@ -207,24 +252,24 @@ header {
 }
 
 main {
-  max-width: 1240px;
+  width: min(100%, var(--page-max));
   margin: 0 auto;
   display: grid;
-  gap: 24px;
+  gap: var(--space-8);
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: var(--pad-card);
   box-shadow: var(--shadow);
   backdrop-filter: blur(16px);
 }
 
 #conversations.card {
   margin-top: 16px;
-  padding: 22px;
+  padding: var(--pad-card-mobile);
   background: transparent;
   border: none;
   box-shadow: none;
@@ -235,7 +280,7 @@ main {
 }
 
 #conversations .section-head h2 {
-  font-size: 1.02rem;
+  font-size: 0.99rem;
   font-weight: 700;
   color: #000000;
   opacity: 1;
@@ -247,14 +292,7 @@ main {
 }
 
 .section-head--new::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-
-.section-head--new .brand-icon {
-  float: left;
-  margin: 2px 12px 6px 0;
+  display: none;
 }
 
 .section-head--new h2 {
@@ -299,7 +337,7 @@ textarea {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.78);
   border-radius: 18px;
-  padding: 14px 16px;
+  padding: var(--space-3) var(--space-4);
   color: var(--ink);
   font-size: 1rem;
   line-height: 1.7;
@@ -310,7 +348,7 @@ textarea {
 }
 
 input[type="text"] {
-  min-height: 72px;
+  min-height: 84px;
 }
 
 textarea {
@@ -650,7 +688,7 @@ button {
 }
 
 .idea-summary {
-  padding: 16px 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -659,12 +697,7 @@ button {
 }
 
 .idea-summary--playable {
-  cursor: default;
-  pointer-events: none;
-}
-
-.idea-summary--playable .idea-cta,
-.idea-summary--playable .idea-meta-date--playable {
+  cursor: pointer;
   pointer-events: auto;
 }
 
@@ -686,11 +719,6 @@ button {
   color: #000000;
 }
 
-/* 完成済みアイデア用: summary 全体はタップ非反応、下の 2 ボタンだけが操作対象 */
-.idea-summary--readonly {
-  cursor: default;
-}
-
 .idea-item--playable:hover {
   transform: none;
 }
@@ -708,7 +736,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 6px;
   width: 100%;
   min-width: 0;
   overflow: hidden;
@@ -727,7 +755,7 @@ button {
 .idea-meta-date--playable {
   color: #7a7f7c;
   font-size: 0.74rem;
-  line-height: 1.3;
+  line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -738,17 +766,8 @@ button {
   width: 100%;
 }
 
-.idea-details-meta {
-  margin-top: 10px;
-  padding-top: 2px;
-}
-
-.idea-details-meta {
-  display: none;
-}
-
-.idea-item.open .idea-details-meta {
-  display: block;
+.idea-meta-date {
+  letter-spacing: 0.004em;
 }
 
 .idea-actions--playable .idea-cta--link {
@@ -764,6 +783,11 @@ button {
 .idea-title-quotes {
   text-align: left;
   justify-self: start;
+}
+
+.idea-cta--toggle {
+  padding: 0;
+  min-height: auto;
 }
 
 .idea-title-quotes {
@@ -789,6 +813,8 @@ button {
   justify-content: flex-start;
   border-radius: 0;
   flex-shrink: 0;
+  color: #161a18;
+  font-weight: 700;
 }
 
 .idea-cta--toggle::after {
@@ -796,9 +822,9 @@ button {
   margin-left: 5px;
   width: 0;
   height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid currentColor;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 3px solid currentColor;
   transition: transform 0.16s ease;
   transform-origin: center;
 }
@@ -824,8 +850,8 @@ button {
 }
 
 .idea-inline-play-icon {
-  width: 18px;
-  height: 18px;
+  width: 21px;
+  height: 21px;
   display: inline-block;
   object-fit: contain;
   flex-shrink: 0;
@@ -833,32 +859,35 @@ button {
 }
 
 .idea-item--playable .idea-summary-main {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 8px;
-  row-gap: 2px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
 }
 
-.idea-item--playable .idea-summary-main .idea-info {
-  width: auto;
-  min-width: 0;
-  grid-column: 1 / span 1;
-}
-
-.idea-item--playable .idea-summary-main .idea-cta--inline-play {
-  margin-left: 0;
-  justify-self: end;
-  text-align: right;
-  align-self: start;
-  float: none;
+.idea-item--playable .idea-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .idea-title-with-avatar {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 7px;
   color: #000000;
+  min-width: 0;
+}
+
+.idea-title-prefix {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.idea-title-quotes {
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .idea-title-avatar {
@@ -879,8 +908,12 @@ button {
 }
 
 .idea-item--playable .idea-summary-main .idea-info h3,
-.idea-item--playable .idea-summary-main .idea-info .date {
+.idea-item--playable .idea-summary-main .idea-info .idea-meta-date {
   text-align: left;
+}
+
+.idea-item--playable .idea-summary-main .idea-title-with-avatar {
+  margin-bottom: 2px;
 }
 
 .idea-cta--link:hover {
@@ -915,23 +948,17 @@ button {
 }
 
 .idea-info h3 {
-  font-size: 1.12rem;
-  line-height: 1.6;
+  font-size: 1.24rem;
+  line-height: 1.35;
   margin-bottom: 4px;
-}
-
-.idea-info .date {
-  color: #000000;
-  font-size: 0.86rem;
-  line-height: 1.5;
 }
 
 /* 各アイデアの進捗ステッパー: Design -> Discussion -> Build */
 .idea-progress {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: 6px 4px 2px;
-  margin: 8px 0 14px;
+  padding: 8px 2px 4px;
+  margin: 10px 0 16px;
 }
 
 /* トグル内（details 内）に出すときは下に余白 */
@@ -971,8 +998,8 @@ button {
 }
 
 .idea-progress-icon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 999px;
   background: #fff;
   border: 2px solid rgba(31, 38, 31, 0.14);
@@ -986,6 +1013,7 @@ button {
   background: transparent;
   border: none;
   padding: 0;
+  box-shadow: none;
 }
 
 .idea-progress-step--done .idea-progress-icon::before {
@@ -996,7 +1024,7 @@ button {
   height: auto;
   background-image: url('/progress-check.svg');
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 82%;
   background-position: center;
 }
 
@@ -1009,14 +1037,14 @@ button {
 
 @keyframes minecraftPulse {
   0%, 100% {
-    transform: scale(1.08);
+    transform: scale(1.06);
     box-shadow:
       0 0 0 0 rgba(31, 157, 99, 0.6),
       0 0 0 4px rgba(31, 157, 99, 0.22),
       0 0 8px rgba(50, 191, 125, 0.55);
   }
   50% {
-    transform: scale(1.16);
+    transform: scale(1.12);
     box-shadow:
       0 0 0 4px rgba(31, 157, 99, 0.32),
       0 0 0 9px rgba(31, 157, 99, 0.08),
@@ -1084,6 +1112,10 @@ button {
   border: 1px solid rgba(212, 190, 108, 0.48);
   font-size: 0.92rem;
   font-weight: 700;
+  width: auto;
+  align-self: flex-start;
+  min-height: 48px;
+  padding: 10px 14px;
 }
 
 .idea-cta--play:hover {
@@ -1337,10 +1369,36 @@ button {
   }
 
   .idea-actions--playable {
-    flex-wrap: wrap;
+    gap: 7px;
   }
 
-  .idea-meta-date {
-    width: auto;
+  .idea-title-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .idea-title-with-avatar {
+    gap: 6px;
+  }
+
+  .idea-title-quotes {
+    overflow-wrap: anywhere;
+  }
+
+  .idea-info h3 {
+    font-size: 1.06rem;
+    line-height: 1.42;
+  }
+
+  .idea-progress-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .idea-progress-step:not(:last-child)::after {
+    left: calc(50% + 13px);
+    right: calc(-50% + 13px);
+    height: 2px;
+    top: 9px;
   }
 }

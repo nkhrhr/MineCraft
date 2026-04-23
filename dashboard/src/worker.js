@@ -91,12 +91,18 @@ async function handleAPI(url, request, env) {
     // GET /api/ideas/:id — アイデア詳細 + hari の返事
     const ideaMatch = url.pathname.match(/^\/api\/ideas\/(\d+)$/);
     if (ideaMatch && request.method === 'GET') {
-      const issueNumber = ideaMatch[1];
+      const issueNumber = Number(ideaMatch[1]);
+      if (!Number.isFinite(issueNumber)) {
+        return new Response(JSON.stringify({ error: 'Invalid idea id' }), { status: 400, headers });
+      }
 
       // D1 からアイデア取得
       const idea = await env.DB.prepare(
         'SELECT * FROM ideas WHERE github_issue_number = ?'
       ).bind(issueNumber).first();
+      if (!idea) {
+        return new Response(JSON.stringify({ error: 'Idea not found' }), { status: 404, headers });
+      }
 
       // GitHub からコメント取得（hari の返事）
       const commentsRes = await fetch(
@@ -109,7 +115,7 @@ async function handleAPI(url, request, env) {
           }
         }
       );
-      const comments = await commentsRes.json();
+      const comments = await safeJsonArray(commentsRes);
 
       // hari（github-actions）のコメントを抽出
       const hariComments = comments
@@ -138,9 +144,13 @@ async function handleAPI(url, request, env) {
     // POST /api/reply — 返信する（Go！ or 修正指示）
     if (url.pathname === '/api/reply' && request.method === 'POST') {
       const { issue_number, message } = await request.json();
+      const issueNumber = Number(issue_number);
+      if (!Number.isFinite(issueNumber)) {
+        return new Response(JSON.stringify({ error: 'invalid issue number' }), { status: 400, headers });
+      }
 
       const ghRes = await fetch(
-        `https://api.github.com/repos/${env.GITHUB_REPO}/issues/${issue_number}/comments`,
+        `https://api.github.com/repos/${env.GITHUB_REPO}/issues/${issueNumber}/comments`,
         {
           method: 'POST',
           headers: {
@@ -159,7 +169,7 @@ async function handleAPI(url, request, env) {
         if (isGo) {
           await env.DB.prepare(
             'UPDATE ideas SET status = "implementing" WHERE github_issue_number = ?'
-          ).bind(issue_number).run();
+          ).bind(issueNumber).run();
         }
         return new Response(JSON.stringify({ ok: true }), { headers });
       }
@@ -211,7 +221,7 @@ async function handleAPI(url, request, env) {
           }
         );
         if (commentsRes.ok) {
-          const comments = await commentsRes.json();
+          const comments = await safeJsonArray(commentsRes);
           const hari = comments.find(c => c.user.login === 'github-actions[bot]' || c.user.type === 'Bot');
           if (hari) {
             await env.DB.prepare(
@@ -282,6 +292,17 @@ async function handleAPI(url, request, env) {
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers });
   }
+}
+
+function safeJsonArray(response) {
+  if (!response || !response.ok) {
+    return [];
+  }
+
+  return response
+    .json()
+    .then((payload) => Array.isArray(payload) ? payload : [])
+    .catch(() => []);
 }
 
 function parseBuildPayload(release) {

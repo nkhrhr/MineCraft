@@ -97,18 +97,25 @@ async function loadIdeas() {
       fetch(`${API}/ideas`, { cache: 'no-store' }),
       fetch(`${API}/latest-build`, { cache: 'no-store' }),
     ]);
+
+    if (!ideasRes.ok || !buildRes.ok) {
+      throw new Error('Failed to load dashboard data');
+    }
+
     const ideas = await ideasRes.json();
     latestBuild = await buildRes.json();
+    const container = document.getElementById('idea-list');
+    if (!container) return;
+
+    if (!Array.isArray(ideas) || !ideas.length) {
+      container.innerHTML = '<p class="empty">No ideas yet. Write one above!</p>';
+      return;
+    }
+
     const latestBuildIssue = latestBuild?.issue_number;
     const buildIssueNumber = Number.isFinite(Number(latestBuildIssue))
       ? Number(latestBuildIssue)
       : null;
-
-    const container = document.getElementById('idea-list');
-    if (!ideas.length) {
-      container.innerHTML = '<p class="empty">No ideas yet. Write one above!</p>';
-      return;
-    }
 
     // 現在開いているアイデアは再レンダー後も維持する
     const openIssue = container.querySelector('.idea-item.open')?.dataset?.issue;
@@ -125,6 +132,10 @@ async function loadIdeas() {
     }
   } catch (e) {
     console.error('ideas error:', e);
+    const container = document.getElementById('idea-list');
+    if (container) {
+      container.innerHTML = '<p class="empty">Could not load ideas. Please refresh.</p>';
+    }
   }
 }
 
@@ -139,31 +150,35 @@ function renderIdeaItem(idea, build, buildIssueNumber = null) {
 
   const updatedAt = new Date(idea.updated_at || idea.created_at);
   const lastUpdated = formatUpdatedAt(updatedAt);
-  const dateHtml = `<div class="date">${lastUpdated}</div>`;
+  const dateText = escapeHtml(lastUpdated);
 
   const progressHtml = renderIdeaProgress(phase.steps);
   const ctaHtml = renderIdeaCta(idea.github_issue_number, phase, build);
 
-  // 完成済みも行全体をトグル対象にする
   const isPlayable = phase.cta?.type === 'play';
-  const summaryClass = isPlayable ? 'idea-summary idea-summary--playable' : 'idea-summary';
-  const summaryOnclick = isPlayable ? '' : `onclick="toggleIdea(${idea.github_issue_number})"`;
-  const rightHtml = isPlayable
-    ? ''  // 完成済みは右端に何も置かない（Play / Chat は下の行に配置）
-    : `<span class="idea-chevron" aria-hidden="true">▸</span>`;
+  const dateHtml = isPlayable
+    ? `<p class="idea-meta-date idea-meta-date--playable">${dateText}</p>`
+    : `<p class="idea-meta-date">${dateText}</p>`;
+  const summaryClass = isPlayable
+    ? 'idea-summary idea-summary--playable'
+    : 'idea-summary';
+  const summaryOnclick = `onclick="toggleIdea(${idea.github_issue_number})"`;
 
-  // 完成済みはタイトル行に「Play this Idea」を配置し、下部は設計参照リンクだけにする
+  // 完成済みはタイトル行に「Play this Idea」を配置し、下部は「Design process」だけにする
   const playActionHtml = isPlayable
-    ? `<a class="idea-cta idea-cta--link idea-cta--inline-play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">
-         <img class="idea-inline-play-icon" src="/play-this-icon.svg" alt="" aria-hidden="true">
-         ${escapeHtml(phase.cta.label)}
-       </a>`
+    ? `
+      <a class="idea-cta idea-cta--play idea-cta--inline-play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">
+        <img class="idea-inline-play-icon" src="/play-this-icon.svg" alt="" aria-hidden="true">
+        ${escapeHtml(phase.cta.label)}
+      </a>`
     : '';
 
-  // 完成済みは「Updated」と「View Design Process」を下部に左寄せで並べる
+  // 完成済みは「Design process」と日付を縦並びでトグル化し、行崩れを防ぐ
   const actionsHtml = isPlayable
     ? `<div class="idea-actions idea-actions--playable">
-         <button class="idea-cta idea-cta--link idea-cta--toggle" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number});" aria-expanded="false" data-issue="${idea.github_issue_number}">View Design Process</button>
+         ${playActionHtml}
+         <button class="idea-cta idea-cta--link idea-cta--toggle" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number});" aria-expanded="false" data-issue="${idea.github_issue_number}">Design process</button>
+         ${dateHtml}
        </div>`
     : ctaHtml;
 
@@ -180,8 +195,6 @@ function renderIdeaItem(idea, build, buildIssueNumber = null) {
             <h3>${renderIdeaTitleWithKokiAvatar(idea.title || '')}</h3>
             ${isPlayable ? '' : dateHtml}
           </div>
-          ${playActionHtml}
-          ${rightHtml}
         </div>
         ${actionsHtml}
       </div>
@@ -348,7 +361,14 @@ async function renderIdeaDetails(issueNumber) {
 
   try {
     const res = await fetch(`${API}/ideas/${issueNumber}`, { cache: 'no-store' });
+    if (!res.ok) {
+      throw new Error('Failed to load idea details');
+    }
+
     const data = await res.json();
+    if (!data?.idea) {
+      throw new Error('Invalid idea data');
+    }
 
     // 最新ステータスに基づいた進捗を再計算してトグル内の先頭に表示
     const detailBuildIssueNumber = latestBuild?.issue_number != null
@@ -356,10 +376,6 @@ async function renderIdeaDetails(issueNumber) {
       : null;
     const phase = computeIdeaPhase(data.idea || {}, latestBuild, detailBuildIssueNumber);
     const progressHtml = renderIdeaProgress(phase.steps);
-    const lastUpdated = formatUpdatedAt(new Date((data.idea?.updated_at || data.idea?.created_at)));
-    const detailMetaHtml = phase.current === 'complete'
-      ? `<p class="idea-details-meta idea-meta-date--playable">${lastUpdated}</p>`
-      : '';
 
     const messages = [];
     for (const h of (data.hari || [])) messages.push({ type: 'hari', body: h.body, time: h.created_at });
@@ -404,7 +420,7 @@ async function renderIdeaDetails(issueNumber) {
       </section>
     `;
 
-    details.innerHTML = progressHtml + designGroup + discussionGroup + detailMetaHtml;
+    details.innerHTML = progressHtml + designGroup + discussionGroup;
   } catch (e) {
     // エラー時も進捗は残す
     const existingProgress = details.querySelector('.idea-progress')?.outerHTML || '';
@@ -428,11 +444,11 @@ async function submitIdea() {
     return;
   }
 
-  btn.disabled = true;
-  statusEl.textContent = 'Sending...';
-  statusEl.style.color = '#000000';
-
   try {
+    btn.disabled = true;
+    statusEl.textContent = 'Sending...';
+    statusEl.style.color = '#000000';
+
     const res = await fetch(`${API}/ideas`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -453,9 +469,9 @@ async function submitIdea() {
   } catch (e) {
     statusEl.textContent = 'Network error.';
     statusEl.style.color = '#000000';
+  } finally {
+    btn.disabled = false;
   }
-
-  btn.disabled = false;
 }
 
 // --- 返信送信 ---
