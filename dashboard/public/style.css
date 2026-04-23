@@ -21,6 +21,10 @@
   --shadow-soft: 0 18px 40px rgba(81, 56, 28, 0.1);
   --radius: 26px;
   --avatar-size: 40px;
+  --idea-hari-avatar-size: 20px;
+  --progress-icon-size: 12px;
+  --progress-connector-half: calc(var(--progress-icon-size) / 2);
+  --play-this-icon-size: 20px;
   --page-max: 1220px;
   --pad-card: 28px;
   --pad-card-mobile: 22px;
@@ -951,8 +955,8 @@ button {
 }
 
 .idea-inline-play-icon {
-  width: 21px;
-  height: 21px;
+  width: var(--play-this-icon-size);
+  height: var(--play-this-icon-size);
   display: inline-block;
   object-fit: contain;
   flex-shrink: 0;
@@ -977,6 +981,8 @@ button {
   gap: 7px;
   color: #000000;
   min-width: 0;
+  width: 100%;
+  min-inline-size: 0;
 }
 
 .idea-title-text {
@@ -984,6 +990,7 @@ button {
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  width: 100%;
 }
 
 .idea-title-prefix {
@@ -998,6 +1005,9 @@ button {
   word-break: break-word;
   white-space: normal;
   line-height: 1.46;
+  width: 100%;
+  max-width: 100%;
+  text-wrap: balance;
 }
 
 .idea-title-avatar {
@@ -1008,6 +1018,11 @@ button {
   object-position: center;
   flex-shrink: 0;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.idea-item--playable .idea-title-avatar {
+  width: 42px;
+  height: 42px;
 }
 
 .idea-title-display {
@@ -1024,6 +1039,19 @@ button {
 
 .idea-item--playable .idea-summary-main .idea-title-with-avatar {
   margin-bottom: 2px;
+  width: 100%;
+  min-width: 0;
+}
+
+.idea-item--playable .idea-actions {
+  width: 100%;
+  min-width: 0;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.idea-item--playable .idea-meta-date--playable {
+  margin-top: 1px;
 }
 
 .idea-cta--link:hover {
@@ -1060,8 +1088,8 @@ button {
 }
 
 .idea-hari-status-avatar {
-  width: 20px;
-  height: 20px;
+  width: var(--idea-hari-avatar-size);
+  height: var(--idea-hari-avatar-size);
   border-radius: 999px;
   object-fit: cover;
   flex-shrink: 0;
@@ -1086,6 +1114,9 @@ button {
   font-size: 1.24rem;
   line-height: 1.35;
   margin-bottom: 4px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* 各アイデアの進捗ステッパー: Design -> Discussion -> Build */
@@ -1115,7 +1146,7 @@ button {
 .idea-progress-step:not(:last-child)::after {
   content: "";
   position: absolute;
-  top: 10px;
+  top: var(--progress-connector-half);
   left: calc(50% + 14px);
   right: calc(-50% + 14px);
   height: 2px;
@@ -1133,8 +1164,8 @@ button {
 }
 
 .idea-progress-icon {
-  width: 13px;
-  height: 13px;
+  width: var(--progress-icon-size);
+  height: var(--progress-icon-size);
   border-radius: 999px;
   background: #fff;
   border: 1.5px solid rgba(31, 38, 31, 0.14);
@@ -1483,6 +1514,13 @@ button {
 }
 
 @media (max-width: 760px) {
+  :root {
+    --avatar-size: 34px;
+    --idea-hari-avatar-size: 17px;
+    --play-this-icon-size: 18px;
+    --progress-icon-size: 10px;
+  }
+
   body {
     padding: 14px;
   }
@@ -1512,8 +1550,8 @@ button {
   }
 
   .idea-title-avatar {
-    width: 36px;
-    height: 36px;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
   }
 
   .idea-title-with-avatar {
@@ -1530,15 +1568,20 @@ button {
   }
 
   .idea-progress-icon {
-    width: 12px;
-    height: 12px;
+    width: var(--progress-icon-size);
+    height: var(--progress-icon-size);
   }
 
   .idea-progress-step:not(:last-child)::after {
-    left: calc(50% + 12px);
-    right: calc(-50% + 12px);
+    left: calc(50% + 11px);
+    right: calc(-50% + 11px);
     height: 2px;
-    top: 8px;
+    top: var(--progress-connector-half);
+  }
+
+  .idea-item--playable .idea-title-avatar {
+    width: 38px;
+    height: 38px;
   }
 
   .idea-cta--link {
