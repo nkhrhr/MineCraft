@@ -811,6 +811,24 @@ button {
   display: block;
 }
 
+/* chat-bubble の中に入れる時は、バブル幅にフィットさせて上下だけマージン */
+.chat-bubble--with-media {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble--with-media .chat-bubble-text {
+  display: inline-block;
+}
+
+.idea-flow-giphy--in-bubble {
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+  border-radius: 14px;
+}
+
 /* Building ステージの説明文を中央寄せにする派生 */
 .idea-flow-note--centered {
   justify-content: center;
