@@ -255,8 +255,7 @@ function renderIdeaTitleWithKokiAvatar(title) {
     <span class="idea-title-with-avatar">
       <img class="idea-title-avatar" src="/photo-koki.png" alt="Koki" loading="lazy">
       <span class="idea-title-text">
-        <span class="idea-title-prefix">Koki's Idea</span>
-        <span class="idea-title-quotes">「${escapeHtml(title || '')}」</span>
+        <span class="idea-title-prefix">Koki's Idea</span><span class="idea-title-quotes">「${escapeHtml(title || '')}」</span>
       </span>
     </span>
   `;

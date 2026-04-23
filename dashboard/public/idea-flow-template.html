@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/style.css?v=20260423-ui82">
+  <link rel="stylesheet" href="/style.css?v=20260423-ui83">
 </head>
 <body>
   <header id="header" class="dashboard-grid">
@@ -35,7 +35,7 @@
       <div class="section-head">
         <p class="eyebrow">Template</p>
         <h2>Idea Flow Templates</h2>
-        <p class="section-copy">Koki's Idea「ドラゴンを追加したい」の3ステートを切り替えて確認できます。</p>
+        <p class="section-copy">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」の3ステートを切り替えて確認できます。</p>
       </div>
       <div class="flow-controls">
         <button class="flow-control-btn is-active" type="button" data-stage="discussion">Discussion with Hari</button>
@@ -45,9 +45,42 @@
       <p><a href="/" class="section-copy">← Koki Designing のメインページへ戻る</a></p>
     </section>
 
+    <section class="card new-idea-flow-card">
+      <div class="section-head section-head--new">
+        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
+        <p class="new-idea-flow-subtitle">Send idea</p>
+      </div>
+      <div class="idea-item idea-item-new open">
+        <div class="idea-summary">
+          <div class="idea-progress" aria-label="Phase progress">
+            <span class="idea-progress-step idea-progress-step--current">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Design by Koki</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--pending">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--pending">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Build by Hari</span>
+            </span>
+          </div>
+          <div class="idea-details" aria-hidden="false">
+            <input type="text" value="ドラゴンが斧を持ってテスト完了を演出してほしい" aria-label="Idea title" readonly>
+            <textarea rows="6" aria-label="Idea details" readonly>ドラゴンは村人の導師に依頼され、討伐時に演出エフェクト（炎と火花）を追加し、倒した瞬間にテスト終了の紙吹雪を出してほしい。</textarea>
+            <button id="submit-btn" type="button">
+              <img class="submit-btn-avatar" src="/photo-hari.png" alt="" aria-hidden="true">
+              Send to Hari
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="flow-discussion" class="card new-idea-flow-card flow-stage is-active" data-state="discussion">
       <div class="section-head section-head--new">
-        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンを追加したい」</h2>
+        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Discussion with Hari</p>
       </div>
       <div class="idea-item idea-item-new open">
@@ -87,7 +120,7 @@
 
     <section id="flow-building" class="card new-idea-flow-card flow-stage" data-state="building">
       <div class="section-head section-head--new">
-        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンを追加したい」</h2>
+        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Build by Hari</p>
       </div>
       <div class="idea-item idea-item-new open">
@@ -121,7 +154,7 @@
 
     <section id="flow-complete" class="card new-idea-flow-card flow-stage" data-state="complete">
       <div class="section-head section-head--new">
-        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンを追加したい」</h2>
+        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Build by Hari</p>
       </div>
       <div class="idea-item idea-item-new open">

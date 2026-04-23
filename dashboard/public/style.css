@@ -989,17 +989,15 @@ button {
 }
 
 .idea-title-text {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 2px;
+  display: inline;
   min-width: 0;
-  width: 100%;
 }
 
 .idea-title-prefix {
   font-weight: 700;
   white-space: nowrap;
   flex-shrink: 0;
+  margin-right: 0.1em;
 }
 
 .idea-title-quotes {
@@ -1008,8 +1006,7 @@ button {
   word-break: break-word;
   white-space: normal;
   line-height: 1.46;
-  width: 100%;
-  max-width: 100%;
+  display: inline;
 }
 
 .idea-title-avatar {
@@ -1168,9 +1165,10 @@ button {
 .idea-progress-step:not(:last-child)::after {
   content: "";
   position: absolute;
-  top: var(--progress-connector-half);
-  left: calc(50% + (var(--progress-icon-size) + var(--progress-connector-offset)));
-  right: calc(-50% + (var(--progress-icon-size) + var(--progress-connector-offset)));
+  top: 50%;
+  transform: translateY(-50%);
+  left: calc(50% + (var(--progress-connector-half) + var(--progress-connector-offset)));
+  right: calc(-50% + (var(--progress-connector-half) + var(--progress-connector-offset)));
   height: 2px;
   border-radius: 2px;
   background: var(--line);
@@ -1260,9 +1258,9 @@ button {
 }
 
 .idea-progress-label--discussion {
-  padding: 2px 8px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
 }
 
 .idea-progress-step--done .idea-progress-label {
@@ -1598,10 +1596,11 @@ button {
   }
 
   .idea-progress-step:not(:last-child)::after {
-    left: calc(50% + (var(--progress-icon-size) + var(--progress-connector-offset)));
-    right: calc(-50% + (var(--progress-icon-size) + var(--progress-connector-offset)));
+    left: calc(50% + (var(--progress-connector-half) + var(--progress-connector-offset)));
+    right: calc(-50% + (var(--progress-connector-half) + var(--progress-connector-offset)));
     height: 2px;
-    top: var(--progress-connector-half);
+    top: 50%;
+    transform: translateY(-50%);
   }
 
   .idea-item--playable .idea-title-avatar {
