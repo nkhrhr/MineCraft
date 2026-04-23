@@ -1235,24 +1235,12 @@ button {
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-/* 完了ステップ: 白い円 + 緑枠 + 中央にチェックのみ */
+/* 完了ステップ: 黒い塗りつぶしの円 */
 .idea-progress-step--done .idea-progress-icon {
-  background: transparent;
+  background: #000000;
   border: none;
   padding: 0;
   box-shadow: none;
-}
-
-.idea-progress-step--done .idea-progress-icon::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  width: auto;
-  height: auto;
-  background-image: url('/progress-check.svg');
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-position: center;
 }
 
 /* 現在ステップ: Minecraft ビーコン風のパルス発光 */
