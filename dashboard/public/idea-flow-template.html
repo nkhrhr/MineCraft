@@ -22,6 +22,65 @@
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/style.css?v=20260424-ui05">
+  <style>
+    .chat-thinking {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.32rem;
+    }
+
+    .chat-thinking-label {
+      white-space: nowrap;
+    }
+
+    .chat-thinking-dots {
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+      min-width: 1.2em;
+      white-space: nowrap;
+      color: #000;
+      font-weight: 600;
+    }
+
+    .chat-thinking-dot {
+      animation: idea-thinking-dot 1.2s infinite steps(1);
+      opacity: 0.22;
+      transform: translateY(0.02em);
+    }
+
+    .chat-thinking-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .chat-thinking-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .chat-thinking-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    .chat-thinking-dot:nth-child(4) {
+      animation-delay: 0.6s;
+    }
+
+    .chat-thinking-dot:nth-child(2),
+    .chat-thinking-dot:nth-child(3),
+    .chat-thinking-dot:nth-child(4) {
+      margin-left: -0.05em;
+    }
+
+    .chat-thinking-dot[aria-hidden="true"] {
+      width: 0.62em;
+    }
+
+    @keyframes idea-thinking-dot {
+      0% { opacity: .2; }
+      20% { opacity: 1; }
+      100% { opacity: .2; }
+    }
+  </style>
 </head>
 <body>
   <header id="header" class="dashboard-grid">
@@ -159,11 +218,14 @@
               <div class="idea-chat">
                 <div class="chat-row chat-row--hari">
                   <img class="chat-avatar chat-avatar--hari" src="/photo-hari.png" alt="Hari" loading="lazy">
-                  <div class="chat-bubble chat-hari">いいね、その案最高。ドラゴン討伐後に帰還テレポートも入れます。</div>
-                </div>
-                <div class="chat-row chat-row--koki">
-                  <img class="chat-avatar chat-avatar--koki" src="/photo-koki.png" alt="Koki" loading="lazy">
-                  <div class="chat-bubble chat-koki">ありがとうございます！報酬は火薬1/エンチャント本で調整したいです。</div>
+                  <div class="chat-bubble chat-hari">
+                    <span class="chat-thinking">
+                      <span class="chat-thinking-label">Hari が考え中</span>
+                      <span class="chat-thinking-dots" aria-hidden="true">
+                        <span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span>
+                      </span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </section>
@@ -177,35 +239,6 @@
         <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Build by Hari</p>
       </div>
-      <section id="flow-building" class="card new-idea-flow-card flow-stage" data-state="building">
-        <div class="idea-item idea-item-new open">
-          <div class="idea-summary">
-            <div class="idea-progress" aria-label="Phase progress">
-              <span class="idea-progress-step idea-progress-step--done">
-                <span class="idea-progress-icon"></span>
-                <span class="idea-progress-label">Design by Koki</span>
-              </span>
-              <span class="idea-progress-step idea-progress-step--done">
-                <span class="idea-progress-icon"></span>
-                <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
-              </span>
-              <span class="idea-progress-step idea-progress-step--current">
-                <span class="idea-progress-icon"></span>
-                <span class="idea-progress-label">Build by Hari</span>
-              </span>
-            </div>
-          </div>
-          <div class="idea-details" aria-hidden="false">
-              <section class="idea-group">
-              <h4 class="idea-group-title">Build by Hari</h4>
-              <p class="idea-flow-note">
-                <span class="idea-flow-loader" aria-hidden="true"></span>
-                Hari がワールド生成中です。少しお待ちください。
-              </p>
-            </section>
-          </div>
-        </div>
-      </section>
     </div>
 
     <div class="flow-state-block">
@@ -213,36 +246,6 @@
         <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Build complete</p>
       </div>
-      <section id="flow-complete" class="card new-idea-flow-card flow-stage" data-state="complete">
-        <div class="idea-item idea-item-new open">
-          <div class="idea-summary">
-            <div class="idea-progress" aria-label="Phase progress">
-              <span class="idea-progress-step idea-progress-step--done">
-                <span class="idea-progress-icon"></span>
-                <span class="idea-progress-label">Design by Koki</span>
-              </span>
-              <span class="idea-progress-step idea-progress-step--done">
-                <span class="idea-progress-icon"></span>
-                <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
-              </span>
-              <span class="idea-progress-step idea-progress-step--done">
-                <span class="idea-progress-icon"></span>
-                <span class="idea-progress-label">Build by Hari</span>
-              </span>
-            </div>
-          </div>
-          <div class="idea-details" aria-hidden="false">
-            <section class="idea-group">
-              <h4 class="idea-group-title">Build complete</h4>
-              <p class="idea-body">ドラゴン追加デザインが反映されたビルドをダウンロードしてそのまま遊べます。</p>
-              <button class="idea-cta idea-cta--play" type="button">
-                <img class="idea-inline-play-icon" src="/play-this-icon.svg" alt="" aria-hidden="true">
-                Play this Idea
-              </button>
-            </section>
-          </div>
-        </div>
-      </section>
     </div>
   </main>
 
