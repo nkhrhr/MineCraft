@@ -644,6 +644,38 @@ button {
   text-transform: uppercase;
 }
 
+.idea-discussion-form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.idea-discussion-input {
+  width: 100%;
+  resize: vertical;
+  min-height: 72px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #000000;
+  font: inherit;
+  line-height: 1.45;
+  max-width: 100%;
+}
+
+.idea-discussion-input:focus {
+  outline: none;
+  border-color: rgba(31, 157, 99, 0.45);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.idea-discussion-form .btn-discussion {
+  align-self: flex-end;
+  min-width: 160px;
+}
+
 .flow-template-link {
   margin-top: 16px;
   margin-bottom: 0;

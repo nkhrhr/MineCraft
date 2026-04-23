@@ -93,6 +93,20 @@
   </header>
 
   <main class="flow-template-page dashboard-grid">
+    <section class="card">
+      <div class="section-head section-head--new">
+        <p class="eyebrow">Template</p>
+        <h2>Idea Flow Templates</h2>
+        <p class="section-copy">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」の4ステートを切り替えて確認できます。</p>
+      </div>
+      <div class="flow-controls">
+        <button class="flow-control-btn is-active" type="button" data-stage="discussion">Discussion with Hari</button>
+        <button class="flow-control-btn" type="button" data-stage="building">Build by Hari</button>
+        <button class="flow-control-btn" type="button" data-stage="complete">Build complete</button>
+      </div>
+      <p><a href="/" class="section-copy">← Koki Designing のメインページへ戻る</a></p>
+    </section>
+
     <section id="new-idea-section" class="card">
       <div class="section-head section-head--new">
         <p class="brand-tagline">
@@ -140,24 +154,9 @@
       </div>
     </section>
 
-    <section class="card">
-      <div class="section-head section-head--new">
-        <p class="eyebrow">Template</p>
-        <h2>Idea Flow Templates</h2>
-        <p class="section-copy">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」の4ステートを切り替えて確認できます。</p>
-      </div>
-      <div class="flow-controls">
-        <button class="flow-control-btn is-active" type="button" data-stage="discussion">Discussion with Hari</button>
-        <button class="flow-control-btn" type="button" data-stage="building">Build by Hari</button>
-        <button class="flow-control-btn" type="button" data-stage="complete">Build complete</button>
-      </div>
-      <p><a href="/" class="section-copy">← Koki Designing のメインページへ戻る</a></p>
-    </section>
-
     <div class="flow-state-block">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Send idea</h2>
-        <p class="new-idea-flow-subtitle">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</p>
       </div>
       <section class="card new-idea-flow-card">
         <div class="idea-item idea-item-new open">
@@ -192,7 +191,6 @@
     <div class="flow-state-block flow-stage is-active" data-state="discussion">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Discussion with Hari</h2>
-        <p class="new-idea-flow-subtitle">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</p>
       </div>
       <section id="flow-discussion" class="card new-idea-flow-card">
         <div class="idea-item idea-item-new open">
@@ -240,6 +238,13 @@
                   <div class="chat-bubble chat-hari">了解です。次の更新で、討伐アニメの尺を合わせて「完了！」の演出も追加します。</div>
                 </div>
               </div>
+              <div class="idea-discussion-form">
+                <textarea class="idea-discussion-input" rows="3" placeholder="Hariへの返信を入力してください（テンプレート用）"></textarea>
+                <button class="btn-discussion" type="button">
+                  <img class="submit-btn-avatar" src="/photo-hari.png" alt="" aria-hidden="true">
+                  Send to Hari
+                </button>
+              </div>
             </section>
           </div>
         </div>
@@ -249,15 +254,72 @@
     <div class="flow-state-block flow-stage" data-state="building">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Build by Hari</h2>
-        <p class="new-idea-flow-subtitle">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</p>
       </div>
+      <section class="card new-idea-flow-card">
+        <div class="idea-item idea-item-new open">
+          <div class="idea-summary">
+            <div class="idea-progress" aria-label="Phase progress">
+              <span class="idea-progress-step idea-progress-step--done">
+                <span class="idea-progress-icon"></span>
+                <span class="idea-progress-label">Design by Koki</span>
+              </span>
+              <span class="idea-progress-step idea-progress-step--done">
+                <span class="idea-progress-icon"></span>
+                <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
+              </span>
+              <span class="idea-progress-step idea-progress-step--current">
+                <span class="idea-progress-icon"></span>
+                <span class="idea-progress-label">Build by Hari</span>
+              </span>
+            </div>
+          </div>
+          <div class="idea-details" aria-hidden="false">
+            <section class="idea-group">
+              <h4 class="idea-group-title">Build by Hari</h4>
+              <p class="idea-flow-note">
+                <span class="idea-flow-loader" aria-hidden="true"></span>
+                Hari がワールド生成中です。少しお待ちください。
+              </p>
+            </section>
+          </div>
+        </div>
+      </section>
     </div>
 
     <div class="flow-state-block flow-stage" data-state="complete">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Build complete</h2>
-        <p class="new-idea-flow-subtitle">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</p>
       </div>
+      <section class="card new-idea-flow-card">
+        <div class="idea-item idea-item-new open">
+          <div class="idea-summary">
+            <div class="idea-progress" aria-label="Phase progress">
+              <span class="idea-progress-step idea-progress-step--done">
+                <span class="idea-progress-icon"></span>
+                <span class="idea-progress-label">Design by Koki</span>
+              </span>
+              <span class="idea-progress-step idea-progress-step--done">
+                <span class="idea-progress-icon"></span>
+                <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
+              </span>
+              <span class="idea-progress-step idea-progress-step--done">
+                <span class="idea-progress-icon"></span>
+                <span class="idea-progress-label">Build by Hari</span>
+              </span>
+            </div>
+          </div>
+          <div class="idea-details" aria-hidden="false">
+            <section class="idea-group">
+              <h4 class="idea-group-title">Build complete</h4>
+              <p class="idea-body">ドラゴン追加デザインが反映されたビルドをダウンロードしてそのまま遊べます。</p>
+              <button class="idea-cta idea-cta--play" type="button">
+                <img class="idea-inline-play-icon" src="/play-this-icon.svg" alt="" aria-hidden="true">
+                Play this Idea
+              </button>
+            </section>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
