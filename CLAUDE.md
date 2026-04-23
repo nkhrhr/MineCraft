@@ -119,8 +119,20 @@ npm run release            # validate + pack + create-world
 
 ### JSON フォーマット
 - Bedrock Edition の format_version に注意（manifest: 2, entity: "1.20.0", dialogue: "1.17.0"）
-- NPC ダイアログの commands 内は `/command` 形式（先頭スラッシュ必須）
+- NPC ダイアログ（`src/BP/dialogue/`）の commands 内は `/command` 形式（先頭スラッシュ必須）
 - ダイアログの対象プレイヤーは `@initiator`（`@p` ではない）
+
+### エンティティ event アクション（頻出バグ・要注意）
+- **`run_command` は存在しない**。Bedrock は黙って無視する → 演出が出ないバグの原因。`queue_command` を使う。
+- `queue_command.command` 内のコマンドには**先頭スラッシュを付けない**（`"tellraw @a ..."`）。
+- 別の event を発火させたい時は action キー `trigger: "event_name"` を使う（`event:` は無効）。
+- 死亡時のフックは **components に `minecraft:on_death`** を置き、その中で `event: "my_event"` と `target: "self"` を指定する（events セクションに `minecraft:on_death` と書いても発火しない）。
+
+### 検証コマンド（Issue 実装後は必ず）
+- `npm run validate` — JSON parse + Blockception スキーマ（警告レベル）
+- `STRICT=1 npm run validate` — スキーマ違反も hard fail（手動監査用）
+- `npm run check-uuids` — BP↔RP の UUID / version 整合
+- `npm run release` — 上記 + ビルド + .mcworld の NBT/構造検証まで通す
 
 ### コミットメッセージ
 ```

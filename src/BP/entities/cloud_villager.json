@@ -80,9 +80,9 @@
     },
     "events": {
       "story:start_dialogue": {
-        "run_command": {
+        "queue_command": {
           "command": [
-            "/dialogue open @s @p cloud_greeting"
+            "dialogue open @s @p cloud_greeting"
           ]
         }
       }

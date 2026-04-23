@@ -133,10 +133,21 @@ ${currentState}
 
 - Bedrock Edition の正しい JSON フォーマットを使う
 - manifest.json の UUID は変更しない
-- NPC ダイアログの commands は "/command" 形式（先頭スラッシュ必須）
+- NPC ダイアログ（src/BP/dialogue/）の commands は "/command" 形式（先頭スラッシュ必須）
 - ダイアログ内の対象プレイヤーは @initiator
 - 日本語テキストは ja_JP.lang にも追記
 - format_version: manifest は 2、entity は "1.20.0"、dialogue は "1.17.0"
+
+## エンティティ event の必須ルール（絶対に守る）
+
+- **"run_command" は無効なアクション**。Bedrock が黙って無視して演出が出ないバグになる。
+  必ず "queue_command" を使う。
+- "queue_command" の command 文字列は **先頭スラッシュなし**（例: "tellraw @a ..."）
+- 別の event を発火する時は { "trigger": "event_name" } を使う（"event": は無効）
+- 死亡時に何かしたい時は、**components に minecraft:on_death を置いて** その中に
+  { "event": "story:on_death", "target": "self" } と書く。
+  events セクションに "minecraft:on_death" を書いても発火しない。
+- minecraft:damage_sensor の deals_damage は文字列 "yes" / "no" / "no_but_side_effects_apply"（true/false ではない）
 
 ## 出力フォーマット
 

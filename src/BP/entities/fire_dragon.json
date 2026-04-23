@@ -115,12 +115,16 @@
         "triggers": [
           {
             "cause": "fall",
-            "deals_damage": false
+            "deals_damage": "no"
           }
         ]
       },
       "minecraft:loot": {
         "table": "loot_tables/entities/fire_dragon.json"
+      },
+      "minecraft:on_death": {
+        "event": "story:on_death",
+        "target": "self"
       }
     },
     "events": {
@@ -131,26 +135,23 @@
             "story:flying"
           ]
         },
-        "run_command": {
+        "queue_command": {
           "command": [
-            "/tellraw @a[r=20] {\"rawtext\":[{\"text\":\"§c§l巨大なファイアドラゴンが現れた！\"}]}",
-            "/playsound mob.enderdragon.growl @a[r=20]",
-            "/particle minecraft:lava_particle ~ ~1 ~",
-            "/particle minecraft:flame_particle ~ ~1.5 ~"
+            "tellraw @a[r=20] {\"rawtext\":[{\"text\":\"§c§l巨大なファイアドラゴンが現れた！\"}]}",
+            "playsound mob.enderdragon.growl @a[r=20]",
+            "particle minecraft:lava_particle ~ ~1 ~",
+            "particle minecraft:flame_particle ~ ~1.5 ~"
           ]
         }
       },
       "story:on_death": {
-        "run_command": {
+        "queue_command": {
           "command": [
-            "/tellraw @a[r=20] {\"rawtext\":[{\"text\":\"§6§lファイアドラゴンを倒した！勇者よ、よくやった！\"}]}",
-            "/playsound ui.toast.challenge_complete @a[r=20]",
-            "/particle minecraft:totem_particle ~ ~1 ~"
+            "tellraw @a[r=20] {\"rawtext\":[{\"text\":\"§6§lファイアドラゴンを倒した！勇者よ、よくやった！\"}]}",
+            "playsound ui.toast.challenge_complete @a[r=20]",
+            "particle minecraft:totem_particle ~ ~1 ~"
           ]
         }
-      },
-      "minecraft:on_death": {
-        "event": "story:on_death"
       }
     }
   }
