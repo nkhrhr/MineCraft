@@ -2,9 +2,36 @@ const API = '/api';
 let resumeRefreshTimer = null;
 let latestBuild = null;
 
+// フォント読み込み完了までロゴを非表示にしてから表示する。
+function revealBrandAfterFonts() {
+  const markReady = () => {
+    document.documentElement.classList.remove('font-loading');
+    document.documentElement.classList.add('font-ready');
+  };
+
+  if (!document.fonts || !document.fonts.ready) {
+    markReady();
+    return;
+  }
+
+  const fallbackTimer = setTimeout(markReady, 1800);
+  document.fonts.ready
+    .then(() => {
+      clearTimeout(fallbackTimer);
+      markReady();
+    })
+    .catch(() => {
+      clearTimeout(fallbackTimer);
+      markReady();
+    });
+}
+
+revealBrandAfterFonts();
+
 // --- 起動 ---
 document.addEventListener('DOMContentLoaded', () => {
   loadIdeas();
+  initTipsModal();
 });
 
 // iPad の PWA/復帰では古い DOM がそのまま見えることがあるので、
@@ -22,6 +49,40 @@ function scheduleResumeRefresh() {
   resumeRefreshTimer = setTimeout(() => {
     refreshAfterAction().catch((e) => console.error('resume refresh error:', e));
   }, 150);
+}
+
+function initTipsModal() {
+  const openBtn = document.getElementById('open-tips-btn');
+  const closeBtn = document.getElementById('close-tips-btn');
+  const overlay = document.getElementById('tips-modal-overlay');
+
+  if (!openBtn || !closeBtn || !overlay) {
+    return;
+  }
+
+  const closeTipsModal = () => {
+    overlay.hidden = true;
+    document.body.classList.remove('tips-modal-open');
+  };
+
+  const openTipsModal = () => {
+    overlay.hidden = false;
+    document.body.classList.add('tips-modal-open');
+  };
+
+  openBtn.addEventListener('click', openTipsModal);
+  closeBtn.addEventListener('click', closeTipsModal);
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+      closeTipsModal();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeTipsModal();
+    }
+  });
 }
 
 // Build Release が出たら進行中のステップを即反映
@@ -68,50 +129,70 @@ function renderIdeaItem(idea, build) {
   const statusLabel = {
     waiting: 'Waiting',
     responded: 'Responded',
-    implementing: 'Building',
-    done: 'Done'
-  }[idea.status] || 'Draft';
+    implementing: phase.current === 'complete' ? '' : 'Building',
+    done: ''
+  }[idea.status] || '';
 
   const updatedAt = new Date(idea.updated_at || idea.created_at);
-  const lastUpdated = isNaN(updatedAt.valueOf())
-    ? 'Updated'
-    : `${formatDateTimeWithTime(updatedAt)} (${formatRelativeFromNow(updatedAt)})`;
+  const lastUpdated = formatUpdatedAt(updatedAt);
+  const dateHtml = `<div class="date">${lastUpdated}</div>`;
 
   const progressHtml = renderIdeaProgress(phase.steps);
   const ctaHtml = renderIdeaCta(idea.github_issue_number, phase, build);
 
-  // 完成済み（playable）は summary 全体のトグル tap を外し、
-  // 「View Design Process」と「Play this Idea」を同サイズで横並び
+  // 完成済みも行全体をトグル対象にする
   const isPlayable = phase.cta?.type === 'play';
-  const summaryClass = isPlayable ? 'idea-summary idea-summary--readonly' : 'idea-summary';
+  const summaryClass = isPlayable ? 'idea-summary idea-summary--playable' : 'idea-summary';
   const summaryOnclick = isPlayable ? '' : `onclick="toggleIdea(${idea.github_issue_number})"`;
   const rightHtml = isPlayable
     ? ''  // 完成済みは右端に何も置かない（Play / Chat は下の行に配置）
     : `<span class="idea-chevron" aria-hidden="true">▸</span>`;
 
-  // 完成済みは「View Design Process」と「Play this Idea」を 2 列で表示
+  // 完成済みはタイトル行に「Play this Idea」を配置し、下部は設計参照リンクだけにする
+  const playActionHtml = isPlayable
+    ? `<a class="idea-cta idea-cta--link idea-cta--inline-play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">
+         <img class="idea-inline-play-icon" src="/play-this-icon.svg" alt="" aria-hidden="true">
+         ${escapeHtml(phase.cta.label)}
+       </a>`
+    : '';
+
+  // 完成済みは「Updated」と「View Design Process」を下部に左寄せで並べる
   const actionsHtml = isPlayable
-    ? `<div class="idea-actions">
-         <button class="idea-cta idea-cta--chat" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number})">View Design Process</button>
-         <a class="idea-cta idea-cta--play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">${phase.cta.label}</a>
+    ? `<div class="idea-actions idea-actions--playable">
+         <button class="idea-cta idea-cta--link idea-cta--toggle" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number});" aria-expanded="false" data-issue="${idea.github_issue_number}">View Design Process</button>
        </div>`
     : ctaHtml;
+
+  const statusHtml = statusLabel
+    ? `<span class="idea-status">${escapeHtml(statusLabel)}</span>`
+    : '';
 
   return `
     <div class="idea-item${isPlayable ? ' idea-item--playable' : ''}" data-issue="${idea.github_issue_number}" data-phase="${phase.current}">
       <div class="${summaryClass}" ${summaryOnclick}>
         <div class="idea-summary-main">
-          <span class="idea-status">${escapeHtml(statusLabel)}</span>
+          ${statusHtml}
           <div class="idea-info">
-            <h3>${escapeHtml(idea.title)}</h3>
-            <div class="date">Updated ${lastUpdated}</div>
+            <h3>${renderIdeaTitleWithKokiAvatar(idea.title || '')}</h3>
+            ${isPlayable ? '' : dateHtml}
           </div>
+          ${playActionHtml}
           ${rightHtml}
         </div>
         ${actionsHtml}
       </div>
       <div class="idea-details" aria-hidden="true">${progressHtml}</div>
     </div>
+  `;
+}
+
+function renderIdeaTitleWithKokiAvatar(title) {
+  return `
+    <span class="idea-title-with-avatar">
+      <img class="idea-title-avatar" src="/photo-koki.png" alt="Koki" loading="lazy">
+      <span class="idea-title-prefix">Koki's Idea</span>
+      <span class="idea-title-quotes">「${escapeHtml(title || '')}」</span>
+    </span>
   `;
 }
 
@@ -162,17 +243,17 @@ function computeIdeaPhase(idea, build) {
 
 function renderIdeaProgress(steps) {
   const entries = [
-    ['design', 'Idea'],
-    ['discussion', 'Discussion with Hari'],
-    ['build', 'Build with Hari'],
-  ];
+      ['design', 'Design by Koki'],
+      ['discussion', 'Discussion with Hari'],
+      ['build', 'Build by Hari'],
+    ];
   return `
     <div class="idea-progress" aria-label="Phase progress">
       ${entries.map(([key, label]) => {
         const state = steps[key];
-        return `<span class="idea-progress-step idea-progress-step--${state}">
+        return `<span class="idea-progress-step idea-progress-step--${state} idea-progress-step--${key}">
           <span class="idea-progress-icon"></span>
-          <span class="idea-progress-label">${label}</span>
+          <span class="idea-progress-label ${key === 'discussion' ? 'idea-progress-label--discussion' : ''}">${label}</span>
         </span>`;
       }).join('')}
     </div>
@@ -228,6 +309,7 @@ async function toggleIdea(issueNumber) {
   if (isOpen) {
     item.classList.remove('open');
     item.querySelector('.idea-details')?.setAttribute('aria-hidden', 'true');
+    item.querySelector('.idea-cta--toggle')?.setAttribute('aria-expanded', 'false');
     return;
   }
 
@@ -239,6 +321,7 @@ async function toggleIdea(issueNumber) {
   });
 
   item.classList.add('open');
+  item.querySelector('.idea-cta--toggle')?.setAttribute('aria-expanded', 'true');
   const details = item.querySelector('.idea-details');
   details.setAttribute('aria-hidden', 'false');
 
@@ -258,6 +341,10 @@ async function renderIdeaDetails(issueNumber) {
     // 最新ステータスに基づいた進捗を再計算してトグル内の先頭に表示
     const phase = computeIdeaPhase(data.idea || {}, latestBuild);
     const progressHtml = renderIdeaProgress(phase.steps);
+    const lastUpdated = formatUpdatedAt(new Date((data.idea?.updated_at || data.idea?.created_at)));
+    const detailMetaHtml = phase.current === 'complete'
+      ? `<p class="idea-details-meta idea-meta-date--playable">${lastUpdated}</p>`
+      : '';
 
     const messages = [];
     for (const h of (data.hari || [])) messages.push({ type: 'hari', body: h.body, time: h.created_at });
@@ -268,7 +355,7 @@ async function renderIdeaDetails(issueNumber) {
     const designGroup = `
       <section class="idea-group">
         <h4 class="idea-group-title">Idea</h4>
-        <div class="idea-title-display">${escapeHtml(data.idea?.title || '')}</div>
+        <div class="idea-title-display">${renderIdeaTitleWithKokiAvatar(data.idea?.title || '')}</div>
         <div class="idea-body">${escapeHtml(data.idea?.body || '')}</div>
       </section>
     `;
@@ -286,7 +373,7 @@ async function renderIdeaDetails(issueNumber) {
       ? `
         <div class="idea-reply">
           <p class="field-kicker">Reply</p>
-          <textarea id="reply-text-${issueNumber}" rows="3" placeholder="hari に変えたい所を伝える..."></textarea>
+          <textarea id="reply-text-${issueNumber}" rows="3" placeholder="変更したい内容を教えてください。 / Please tell me what to change."></textarea>
           <div class="reply-buttons">
             <button class="btn-discussion" onclick="sendReply(${issueNumber})">Discussion</button>
           </div>
@@ -302,7 +389,7 @@ async function renderIdeaDetails(issueNumber) {
       </section>
     `;
 
-    details.innerHTML = progressHtml + designGroup + discussionGroup;
+    details.innerHTML = progressHtml + designGroup + discussionGroup + detailMetaHtml;
   } catch (e) {
     // エラー時も進捗は残す
     const existingProgress = details.querySelector('.idea-progress')?.outerHTML || '';
@@ -414,7 +501,8 @@ function mapSubmitError(errorMessage) {
 function formatDateTimeWithTime(date) {
   const monthDay = date.toLocaleDateString('en-US', {
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
+    year: 'numeric'
   });
   const time = date.toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -422,6 +510,20 @@ function formatDateTimeWithTime(date) {
     hour12: false
   });
   return `${monthDay} ${time}`;
+}
+
+function formatUpdatedAt(date) {
+  if (!date || Number.isNaN(new Date(date).valueOf())) {
+    return 'Updated';
+  }
+  return `Updated ${toTitleCase(formatRelativeFromNow(date))} (${formatDateTimeWithTime(date)})`;
+}
+
+function toTitleCase(text) {
+  return text
+    .split(' ')
+    .map(word => (word ? `${word[0].toUpperCase()}${word.slice(1)}` : word))
+    .join(' ');
 }
 
 function formatRelativeFromNow(date) {

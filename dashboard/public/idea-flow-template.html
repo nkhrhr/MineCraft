@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja" class="font-loading">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Koki Idea Flow Template</title>
+
+  <link rel="icon" type="image/png" href="/icon.png">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#3e6b24">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Koki Designing Minecraft">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/style.css?v=20260423-ui76">
+</head>
+<body>
+  <header id="header">
+    <div class="brand">
+      <h1 class="brand-title">
+        Koki<br />Designing<br />Minecraft
+      </h1>
+      <img src="/icon.png" alt="" class="brand-icon">
+    </div>
+  </header>
+
+  <main class="flow-template-page">
+    <section class="card">
+      <div class="section-head">
+        <p class="eyebrow">Template</p>
+        <h2>Idea Flow Templates</h2>
+        <p class="section-copy">Koki's Idea「ドラゴンを追加したい」の3ステートを切り替えて確認できます。</p>
+      </div>
+      <div class="flow-controls">
+        <button class="flow-control-btn is-active" type="button" data-stage="discussion">Discussion with Hari</button>
+        <button class="flow-control-btn" type="button" data-stage="building">Build by Hari</button>
+        <button class="flow-control-btn" type="button" data-stage="complete">Build complete</button>
+      </div>
+      <p><a href="/" class="section-copy">← Koki Designing のメインページへ戻る</a></p>
+    </section>
+
+    <section id="flow-discussion" class="card new-idea-flow-card flow-stage is-active" data-state="discussion">
+      <div class="section-head section-head--new">
+        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンを追加したい」</h2>
+        <p class="new-idea-flow-subtitle">Discussion with Hari</p>
+      </div>
+      <div class="idea-item idea-item-new open">
+        <div class="idea-summary">
+          <div class="idea-progress" aria-label="Phase progress">
+            <span class="idea-progress-step idea-progress-step--done">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Design by Koki</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--current">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--pending">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Build by Hari</span>
+            </span>
+          </div>
+        </div>
+        <div class="idea-details" aria-hidden="false">
+          <section class="idea-group">
+            <h4 class="idea-group-title">Discussion with Hari</h4>
+            <div class="idea-chat">
+              <div class="chat-row chat-row--hari">
+                <img class="chat-avatar chat-avatar--hari" src="/photo-hari.png" alt="Hari" loading="lazy">
+                <div class="chat-bubble chat-hari">いいね、その案最高。ドラゴン討伐後に帰還テレポートも入れます。</div>
+              </div>
+              <div class="chat-row chat-row--koki">
+                <img class="chat-avatar chat-avatar--koki" src="/photo-koki.png" alt="Koki" loading="lazy">
+                <div class="chat-bubble chat-koki">ありがとうございます！報酬は火薬1/エンチャント本で調整したいです。</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="flow-building" class="card new-idea-flow-card flow-stage" data-state="building">
+      <div class="section-head section-head--new">
+        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンを追加したい」</h2>
+        <p class="new-idea-flow-subtitle">Build by Hari</p>
+      </div>
+      <div class="idea-item idea-item-new open">
+        <div class="idea-summary">
+          <div class="idea-progress" aria-label="Phase progress">
+            <span class="idea-progress-step idea-progress-step--done">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Design by Koki</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--done">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--current">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Build by Hari</span>
+            </span>
+          </div>
+        </div>
+        <div class="idea-details" aria-hidden="false">
+          <section class="idea-group">
+            <h4 class="idea-group-title">Build in progress</h4>
+            <p class="idea-flow-note">
+              <span class="idea-flow-loader" aria-hidden="true"></span>
+              Building world file now. This is taking a moment.
+            </p>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="flow-complete" class="card new-idea-flow-card flow-stage" data-state="complete">
+      <div class="section-head section-head--new">
+        <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンを追加したい」</h2>
+        <p class="new-idea-flow-subtitle">Build by Hari</p>
+      </div>
+      <div class="idea-item idea-item-new open">
+        <div class="idea-summary">
+          <div class="idea-progress" aria-label="Phase progress">
+            <span class="idea-progress-step idea-progress-step--done">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Design by Koki</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--done">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label idea-progress-label--discussion">Discussion with Hari</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--done">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Build by Hari</span>
+            </span>
+          </div>
+        </div>
+        <div class="idea-details" aria-hidden="false">
+          <section class="idea-group">
+            <h4 class="idea-group-title">Build complete</h4>
+            <p class="idea-body">ドラゴン追加デザインが反映されたビルドをダウンロードしてそのまま遊べます。</p>
+            <button class="idea-cta idea-cta--play" type="button">
+              <img class="idea-inline-play-icon" src="/play-this-icon.svg" alt="" aria-hidden="true">
+              Play this Idea
+            </button>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const buttons = document.querySelectorAll('.flow-control-btn');
+      const stages = document.querySelectorAll('.flow-stage');
+
+      function setActiveStage(state) {
+        stages.forEach((stage) => {
+          stage.classList.toggle('is-active', stage.dataset.state === state);
+        });
+
+        buttons.forEach((btn) => {
+          btn.classList.toggle('is-active', btn.dataset.stage === state);
+        });
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const state = button.dataset.stage;
+          setActiveStage(state);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
