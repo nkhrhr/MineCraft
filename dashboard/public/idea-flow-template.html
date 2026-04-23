@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/style.css?v=20260424-ui05">
+  <link rel="stylesheet" href="/style.css?v=20260424-ui06">
   <style>
     .chat-thinking {
       display: inline-flex;
@@ -88,12 +88,13 @@
       <div class="section-head section-head--new">
         <p class="eyebrow">Template</p>
         <h2>Idea Flow Templates</h2>
-        <p class="section-copy">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」の4ステートを切り替えて確認できます。</p>
+        <p class="section-copy">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」の全ステートを縦に並べて確認できます。下のボタンで各セクションにジャンプできます。</p>
       </div>
       <div class="flow-controls">
-        <button class="flow-control-btn is-active" type="button" data-stage="discussion">Discussion with Hari</button>
-        <button class="flow-control-btn" type="button" data-stage="building">Build by Hari</button>
-        <button class="flow-control-btn" type="button" data-stage="complete">Build complete</button>
+        <button class="flow-control-btn" type="button" data-jump="design">Send idea</button>
+        <button class="flow-control-btn" type="button" data-jump="discussion">Discussion with Hari</button>
+        <button class="flow-control-btn" type="button" data-jump="building">Build by Hari</button>
+        <button class="flow-control-btn" type="button" data-jump="complete">Build complete</button>
       </div>
       <p><a href="/" class="section-copy">← Koki Designing のメインページへ戻る</a></p>
     </section>
@@ -145,7 +146,7 @@
       </div>
     </section>
 
-    <div class="flow-state-block">
+    <div id="stage-design" class="flow-state-block">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Send idea</h2>
       </div>
@@ -179,7 +180,7 @@
       </section>
     </div>
 
-    <div class="flow-state-block flow-stage is-active" data-state="discussion">
+    <div id="stage-discussion" class="flow-state-block">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Discussion with Hari</h2>
       </div>
@@ -242,7 +243,7 @@
       </section>
     </div>
 
-    <div class="flow-state-block flow-stage" data-state="building">
+    <div id="stage-building" class="flow-state-block">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Build by Hari</h2>
       </div>
@@ -277,7 +278,7 @@
       </section>
     </div>
 
-    <div class="flow-state-block flow-stage" data-state="complete">
+    <div id="stage-complete" class="flow-state-block">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Build complete</h2>
       </div>
@@ -317,7 +318,6 @@
   <script>
     (function () {
       const buttons = document.querySelectorAll('.flow-control-btn');
-      const stages = document.querySelectorAll('.flow-stage');
 
       function ensureNewHeaderStyle() {
         document.querySelectorAll('.section-head').forEach((head) => {
@@ -325,26 +325,16 @@
         });
       }
 
-      function setActiveStage(state) {
-        if (!state) {
-          return;
-        }
-
-        stages.forEach((stage) => {
-          stage.classList.toggle('is-active', stage.dataset.state === state);
-        });
-
-        buttons.forEach((btn) => {
-          btn.classList.toggle('is-active', btn.dataset.stage === state);
-        });
-
-        ensureNewHeaderStyle();
-      }
-
       buttons.forEach((button) => {
         button.addEventListener('click', () => {
-          const state = button.dataset.stage;
-          setActiveStage(state);
+          const target = button.dataset.jump;
+          if (!target) {
+            return;
+          }
+          const el = document.getElementById('stage-' + target);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         });
       });
 
