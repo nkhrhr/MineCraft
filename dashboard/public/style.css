@@ -1,562 +1,791 @@
-@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #2b1d0e;
-  --card: #3b2a14;
-  --card-border: #5a3a1a;
-  --grass: #5d8c3e;
-  --grass-dark: #3e6b24;
-  --dirt: #866043;
-  --stone: #7f7f7f;
-  --diamond: #5decf5;
-  --gold: #fcdb05;
-  --emerald: #17dd62;
-  --redstone: #d93a3a;
-  --text: #e8dcc8;
-  --text-dim: #a89478;
-  --radius: 4px;
-  --border: 3px solid var(--card-border);
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  --bg: #ede4d4;
+  --bg-deep: #d8ccb8;
+  --surface: rgba(255, 250, 242, 0.84);
+  --surface-strong: #fffaf1;
+  --surface-dark: #21352a;
+  --surface-dark-2: #2e513d;
+  --ink: #1f261f;
+  --ink-soft: #5f6a61;
+  --line: rgba(34, 42, 36, 0.1);
+  --line-strong: rgba(34, 42, 36, 0.18);
+  --accent: #1f9d63;
+  --accent-deep: #0f7d4a;
+  --accent-soft: rgba(31, 157, 99, 0.12);
+  --amber: #f4c860;
+  --amber-soft: rgba(244, 200, 96, 0.18);
+  --blue-soft: rgba(72, 154, 214, 0.14);
+  --danger: #d95b57;
+  --shadow: 0 28px 70px rgba(81, 56, 28, 0.14);
+  --shadow-soft: 0 18px 40px rgba(81, 56, 28, 0.1);
+  --radius: 26px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'DotGothic16', monospace;
-  background: var(--bg);
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px),
-    repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(0,0,0,0.1) 31px, rgba(0,0,0,0.1) 32px);
-  color: var(--text);
+  font-family: var(--font-ui);
+  color: var(--ink);
   min-height: 100dvh;
-  padding-bottom: 40px;
-  image-rendering: pixelated;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 245, 221, 0.9), transparent 36%),
+    radial-gradient(circle at bottom right, rgba(196, 231, 208, 0.65), transparent 28%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
 }
 
-/* ヘッダー */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.2), transparent 42%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 0,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px,
+      transparent 28px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(32, 53, 42, 0.03) 0,
+      rgba(32, 53, 42, 0.03) 1px,
+      transparent 1px,
+      transparent 28px
+    );
+  opacity: 0.6;
+}
+
 header {
-  background: var(--grass-dark);
-  border-bottom: 4px solid var(--grass);
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  max-width: 1240px;
+  margin: 0 auto 28px;
+  padding: 28px 30px;
+  color: var(--ink);
 }
 
-header h1 {
-  flex: 1;
-  font-size: 1.2em;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-}
-
-.level-badge {
-  background: var(--gold);
-  color: #3b2a14;
-  padding: 4px 12px;
-  border: var(--border);
-  border-color: #d4a800;
-  font-weight: 700;
-  font-size: 0.9em;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  text-shadow: none;
-}
-
-.stats {
-  display: flex;
-  gap: 12px;
-  font-size: 0.85em;
-  opacity: 0.9;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-}
-
-/* レイアウト（左サイド + メイン） */
-.layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 0;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* 左サイド「いま作業中」カード */
-#progress-rail {
-  padding: 20px 16px;
-  border-right: 3px solid var(--card-border);
-  background: rgba(0, 0, 0, 0.15);
-  min-height: calc(100dvh - 72px);
-  position: sticky;
-  top: 72px;
-  align-self: start;
-}
-
-.rail-title {
-  font-size: 0.9em;
-  letter-spacing: 2px;
-  color: var(--gold);
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.actor-card {
-  border: 3px solid var(--card-border);
-  background: var(--card);
-  padding: 20px 12px;
-  text-align: center;
-  transition: border-color 0.3s, background 0.3s;
-}
-
-.actor-card[data-actor="hari"] {
-  border-color: var(--emerald);
-  background: rgba(23, 221, 98, 0.08);
-}
-
-.actor-card[data-actor="koki"] {
-  border-color: var(--gold);
-  background: rgba(252, 219, 5, 0.08);
-}
-
-.actor-avatar {
-  font-size: 3em;
-  line-height: 1;
-  margin-bottom: 10px;
-  display: inline-block;
-}
-
-/* hari が作業中のときだけアバターが回る */
-.actor-card[data-working="true"] .actor-avatar {
-  animation: spin 1.5s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.actor-name {
-  font-size: 1em;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-  margin-bottom: 6px;
-}
-
-.actor-card[data-actor="hari"] .actor-name { color: var(--emerald); }
-.actor-card[data-actor="koki"] .actor-name { color: var(--gold); }
-
-.actor-action {
-  font-size: 0.8em;
-  color: var(--text-dim);
-  line-height: 1.5;
-  min-height: 2.4em;
-}
-
-/* プログレスバー */
-.progress-bar {
-  margin-top: 16px;
-  padding: 0 4px;
+.brand {
   position: relative;
-}
-
-.progress-bar::before {
-  content: '';
-  position: absolute;
-  top: 11px;
-  left: 16px;
-  right: 16px;
-  height: 4px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--card-border);
-}
-
-.progress-fill {
-  position: absolute;
-  top: 11px;
-  left: 16px;
-  height: 4px;
-  background: linear-gradient(90deg, var(--grass) 0%, var(--emerald) 100%);
-  border: 1px solid var(--grass-dark);
-  transition: width 0.6s ease;
-  max-width: calc(100% - 32px);
-}
-
-.progress-ticks {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-}
-
-.tick {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--card);
-  border: 2px solid var(--card-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85em;
-  opacity: 0.4;
-  transition: opacity 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
-.tick.done {
-  opacity: 1;
-  border-color: var(--grass-dark);
-  background: var(--grass);
+.brand-icon {
+  width: 72px;
+  height: 72px;
+  /* iOS 風スクワークル: アイコンサイズの約 22% が iOS の squircle 近似 */
+  border-radius: 22.37%;
+  flex-shrink: 0;
+  object-fit: cover;
+  /* iOS 風の多層ドロップシャドー（近距離の鋭さ + 遠距離のふわっと感を重ねる） */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 4px 10px rgba(0, 0, 0, 0.16),
+    0 14px 28px rgba(0, 0, 0, 0.22);
 }
 
-.tick.current {
-  opacity: 1;
-  border-color: var(--gold);
-  background: rgba(252, 219, 5, 0.2);
-  transform: scale(1.2);
-  box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.55);
-  animation: pulse-tick 1.6s ease-in-out infinite;
+.eyebrow,
+.section-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
-@keyframes pulse-tick {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(252, 219, 5, 0.55); }
-  50% { box-shadow: 0 0 0 6px rgba(252, 219, 5, 0); }
+.eyebrow {
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 10px;
 }
 
-/* モバイル: 上に横置き（コンパクト） */
-@media (max-width: 767px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-  #progress-rail {
-    position: sticky;
-    top: 72px;
-    min-height: auto;
-    border-right: none;
-    border-bottom: 3px solid var(--card-border);
-    padding: 8px 10px;
-    z-index: 9;
-  }
-  .rail-title { display: none; }
-  .actor-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    text-align: left;
-  }
-  .actor-avatar { font-size: 2em; margin-bottom: 0; }
-  .actor-name { margin-bottom: 2px; font-size: 0.9em; }
-  .actor-action { font-size: 0.75em; min-height: 1.2em; }
+/* ブランドの 3 行スタック: Koki / Designing / [Project]
+   Playwrite NZ Guides = 手書き練習ノート風（補助線の点線入り） */
+.brand-title {
+  font-family: "Playwrite NZ Guides", "Segoe Script", "Bradley Hand", cursive;
+  font-weight: 400;
+  font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  margin-bottom: 0;
 }
 
-/* カード */
+.brand-line {
+  display: block;
+}
+
+/* プロジェクト名（Minecraft / Cooking 等）は軽くアクセント色にしておく */
+.brand-line--project {
+  color: var(--accent-deep);
+}
+
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
 .card {
-  background: var(--card);
-  border: var(--border);
-  padding: 20px;
-  margin: 12px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 4px 4px 0 rgba(0,0,0,0.3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.section-head {
+  margin-bottom: 20px;
+}
+
+.section-kicker {
+  color: var(--accent-deep);
+  margin-bottom: 10px;
+}
+
+/* 入力フィールドの直前に置くラベル（section-kicker と同じ見た目） */
+.field-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--accent-deep);
+  margin: 4px 0 8px;
 }
 
 .card h2 {
-  font-size: 1em;
-  margin-bottom: 14px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-  letter-spacing: 1px;
-}
-
-/* 入力 */
-input[type="text"], textarea {
-  width: 100%;
-  background: #1a1008;
-  border: 3px solid var(--dirt);
-  padding: 10px;
-  color: var(--text);
-  font-size: 0.95em;
-  font-family: 'DotGothic16', monospace;
-  resize: vertical;
+  font-size: 1.55rem;
+  line-height: 1.08;
   margin-bottom: 10px;
 }
 
-input::placeholder, textarea::placeholder {
-  color: var(--text-dim);
+.section-copy {
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.65;
 }
 
-input:focus, textarea:focus {
+input[type="text"],
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-family: var(--font-ui);
+  resize: vertical;
+  margin-bottom: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+textarea {
+  min-height: 180px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #7f877f;
+}
+
+input:focus,
+textarea:focus {
   outline: none;
-  border-color: var(--emerald);
+  border-color: rgba(31, 157, 99, 0.44);
+  box-shadow: 0 0 0 4px rgba(31, 157, 99, 0.12);
 }
 
-/* ボタン */
 button {
-  font-family: 'DotGothic16', monospace;
+  font-family: var(--font-ui);
   cursor: pointer;
   border: none;
-  font-size: 1em;
 }
 
 #submit-btn {
   width: 100%;
-  padding: 12px;
-  background: var(--grass);
-  border: 3px solid var(--grass-dark);
-  color: #fff;
-  font-weight: 700;
-  font-size: 1.05em;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3);
-  transition: transform 0.05s;
+  min-height: 60px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+  color: #fffdf6;
+  font-weight: 800;
+  font-size: 1rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  white-space: normal;
+  box-shadow: 0 16px 28px rgba(31, 157, 99, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+#submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 32px rgba(31, 157, 99, 0.26);
 }
 
 #submit-btn:active {
-  transform: translateY(2px);
-  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.2), 1px 1px 0 rgba(0,0,0,0.3);
+  transform: translateY(0);
 }
 
-#submit-btn:disabled { opacity: 0.5; }
+#submit-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
 
 .status-msg {
-  text-align: center;
-  margin-top: 8px;
-  font-size: 0.85em;
-  min-height: 1.2em;
+  min-height: 1.4em;
+  margin-top: 10px;
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
-/* アイデアリスト */
+#idea-list {
+  display: grid;
+  gap: 12px;
+}
+
 .idea-item {
-  background: rgba(0,0,0,0.2);
-  border: 2px solid var(--card-border);
-  padding: 12px;
-  margin-bottom: 8px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.74);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+  overflow: hidden;
+}
+
+.idea-item:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.idea-item.open {
+  border-color: rgba(31, 157, 99, 0.28);
+  box-shadow: var(--shadow-soft);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+/* New Idea カードは親の .card の中にそのまま溶け込む（二重ボーダー回避） */
+.idea-item-new,
+.idea-item-new.open {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  overflow: visible;
+}
+
+.idea-item-new .idea-summary {
+  padding: 0;
+  cursor: default;
+  gap: 0;
+}
+
+.idea-item-new .idea-details {
+  padding: 0;
+  border-top: none;
+}
+
+.idea-item-new.open .idea-details {
+  padding: 14px 0 0;
+  border-top: none;
+  max-height: none;
+}
+
+.idea-summary {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.idea-summary-main {
   display: flex;
   align-items: center;
-  gap: 10px;
-  transition: background 0.1s;
+  gap: 14px;
 }
 
-.idea-item:active { background: rgba(0,0,0,0.4); }
+.idea-chevron {
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
 
-.idea-status { font-size: 1.3em; flex-shrink: 0; }
-.idea-info { flex: 1; min-width: 0; }
+.idea-item.open .idea-chevron {
+  transform: rotate(90deg);
+  color: var(--accent-deep);
+}
+
+/* 完成済みアイデア用: summary 全体はタップ非反応、下の 2 ボタンだけが操作対象 */
+.idea-summary--readonly {
+  cursor: default;
+}
+
+.idea-item--playable:hover {
+  transform: none;
+}
+
+/* 完成済みアイデアの横並び 2 ボタン: Chat と Play を等価サイズに */
+.idea-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Chat ボタン: Play と同じサイズ、ミーティングを表す緑アクセント（outline 寄り） */
+.idea-cta--chat {
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(31, 157, 99, 0.34);
+  color: var(--accent-deep);
+  box-shadow: 0 8px 18px rgba(31, 157, 99, 0.08);
+}
+
+.idea-cta--chat:hover {
+  transform: translateY(-1px);
+  background: #ffffff;
+  border-color: rgba(31, 157, 99, 0.55);
+  box-shadow: 0 12px 22px rgba(31, 157, 99, 0.14);
+}
+
+.idea-item.open .idea-cta--chat {
+  background: var(--accent-soft);
+  border-color: rgba(31, 157, 99, 0.55);
+}
+
+.idea-status {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--amber-soft);
+  flex-shrink: 0;
+}
+
+.idea-info {
+  flex: 1;
+  min-width: 0;
+}
 
 .idea-info h3 {
-  font-size: 0.9em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 1rem;
+  line-height: 1.45;
+  margin-bottom: 4px;
 }
 
 .idea-info .date {
-  font-size: 0.75em;
-  color: var(--text-dim);
-  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
 }
 
-/* ビルド */
-.build-btn {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  font-family: 'DotGothic16', monospace;
-  font-weight: 700;
-  text-decoration: none;
-  text-align: center;
-  margin-top: 10px;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-  border: 3px solid;
-  box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3);
-  transition: transform 0.05s;
+/* 各アイデアの進捗ステッパー: 🎨 Design → 💬 Discussion → 🔨 Build */
+.idea-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 6px 4px 2px;
 }
 
-.build-btn:active {
-  transform: translateY(2px);
+/* トグル内（details 内）に出すときは下に余白 */
+.idea-details > .idea-progress {
+  padding: 8px 4px 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed rgba(34, 42, 36, 0.08);
 }
 
-.build-btn.mcworld {
-  background: var(--emerald);
-  border-color: #0fa84a;
-  color: #1a1008;
+.idea-progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  min-width: 0;
 }
 
-/* メインの「iPad で遊ぶ」ボタンは一段大きく */
-.build-btn.play {
-  font-size: 1.3em;
-  padding: 22px 12px;
-  letter-spacing: 2px;
-  background: linear-gradient(180deg, #6dd989 0%, var(--emerald) 100%);
-  border-color: #0fa84a;
-  color: #1a1008;
-  animation: play-ready 2.2s ease-in-out infinite;
+/* ステップ間のコネクタ（最終ステップ以外） */
+.idea-progress-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: calc(50% + 14px);
+  right: calc(-50% + 14px);
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(31, 38, 31, 0.12);
+  z-index: 0;
 }
 
-.build-btn.play .sub {
-  display: block;
-  font-size: 0.55em;
-  font-weight: 400;
-  letter-spacing: 1px;
-  margin-top: 4px;
-  color: #1a3808;
-  text-shadow: none;
+.idea-progress-step--done:not(:last-child)::after {
+  background: linear-gradient(90deg, rgba(20, 159, 93, 0.6), rgba(20, 159, 93, 0.45));
 }
 
-@keyframes play-ready {
-  0%, 100% { box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3), 0 0 0 0 rgba(23, 221, 98, 0.5); }
-  50% { box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 3px 3px 0 rgba(0,0,0,0.3), 0 0 0 8px rgba(23, 221, 98, 0); }
+.idea-progress-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid rgba(31, 38, 31, 0.14);
+  position: relative;
+  z-index: 1;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-.build-btn.mcaddon {
-  background: var(--diamond);
-  border-color: #3ab8c8;
-  color: #1a1008;
-  font-size: 0.85em;
-  padding: 8px;
-  opacity: 0.85;
+/* 完了ステップ: 白い円 + 緑枠 + 中央に ✓ のみ */
+.idea-progress-step--done .idea-progress-icon {
+  background: #fff;
+  border-color: var(--accent-deep);
 }
 
-.build-version {
-  text-align: center;
-  font-size: 0.8em;
-  color: var(--text-dim);
-  margin-top: 8px;
-}
-
-/* モーダル */
-.modal {
-  position: fixed;
+.idea-progress-step--done .idea-progress-icon::before {
+  content: "✓";
+  position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.75);
-  z-index: 100;
+  display: grid;
+  place-items: center;
+  color: var(--accent-deep);
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* 現在ステップ: Minecraft ビーコン風のパルス発光 */
+.idea-progress-step--current .idea-progress-icon {
+  background: linear-gradient(135deg, #32bf7d, #149f5d);
+  border-color: var(--accent-deep);
+  animation: minecraftPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes minecraftPulse {
+  0%, 100% {
+    transform: scale(1.08);
+    box-shadow:
+      0 0 0 0 rgba(31, 157, 99, 0.6),
+      0 0 0 4px rgba(31, 157, 99, 0.22),
+      0 0 8px rgba(50, 191, 125, 0.55);
+  }
+  50% {
+    transform: scale(1.16);
+    box-shadow:
+      0 0 0 4px rgba(31, 157, 99, 0.32),
+      0 0 0 9px rgba(31, 157, 99, 0.08),
+      0 0 18px rgba(108, 231, 166, 0.9);
+  }
+}
+
+/* 動きを抑えたい人には配慮 */
+@media (prefers-reduced-motion: reduce) {
+  .idea-progress-step--current .idea-progress-icon {
+    animation: none;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 5px rgba(31, 157, 99, 0.22);
+  }
+}
+
+.idea-progress-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.idea-progress-step--done .idea-progress-label {
+  color: var(--accent-deep);
+}
+
+.idea-progress-step--current .idea-progress-label {
+  color: var(--accent-deep);
+}
+
+/* アイデアごとの primary CTA（フェーズに応じて一つだけ表示） */
+.idea-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.idea-cta--play {
+  background: linear-gradient(135deg, #fff4d2 0%, #f6d47d 100%);
+  color: #1e261f;
+  box-shadow: 0 12px 24px rgba(23, 34, 27, 0.16);
+}
+
+.idea-cta--play:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(23, 34, 27, 0.2);
+}
+
+.idea-cta--build {
+  background: linear-gradient(135deg, #32bf7d, #149f5d);
+  color: #fffdf8;
+  box-shadow: 0 12px 24px rgba(20, 159, 93, 0.22);
+}
+
+.idea-cta--build:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(20, 159, 93, 0.28);
+}
+
+.idea-cta--status {
+  background: rgba(244, 200, 96, 0.14);
+  border: 1px dashed rgba(244, 200, 96, 0.38);
+  color: #8a6208;
+  font-weight: 700;
+  font-size: 0.94rem;
+  cursor: default;
+  gap: 8px;
+}
+
+.idea-cta:active {
+  transform: translateY(0);
+}
+
+.idea-details {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 18px;
+  transition: max-height 0.32s ease, padding 0.32s ease;
+}
+
+.idea-item.open .idea-details {
+  max-height: 3000px;
+  padding: 4px 18px 18px;
+}
+
+/* 展開時のグルーピング（フェーズごとの束ね） */
+.idea-group {
+  margin-bottom: 22px;
+}
+
+.idea-group:last-child {
+  margin-bottom: 0;
+}
+
+.idea-group-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent-deep);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(31, 157, 99, 0.22);
+}
+
+/* 既存アイデアは読み取り専用の表示なので枠や背景なし（プレーンテキスト扱い） */
+.idea-title-display {
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+.idea-body {
+  margin-bottom: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+/* iOS iMessage 風チャット（アバター付き） */
+.idea-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 2px 0;
+}
+
+.chat-row {
   display: flex;
   align-items: flex-end;
-  justify-content: center;
+  gap: 8px;
 }
 
-.modal-content {
-  background: var(--card);
-  border: var(--border);
-  border-bottom: none;
-  padding: 24px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 85dvh;
-  overflow-y: auto;
+.chat-row--hari {
+  justify-content: flex-start;
 }
 
-.modal-close {
-  float: right;
-  background: var(--redstone);
-  border: 2px solid #a82a2a;
-  color: #fff;
-  width: 30px;
-  height: 30px;
-  font-size: 0.85em;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+.chat-row--koki {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 
-#modal-title {
-  font-size: 1.1em;
-  margin-bottom: 12px;
-  padding-right: 40px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+.chat-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  background: #fff;
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
 }
 
-#modal-body {
-  font-size: 0.85em;
-  color: var(--text-dim);
-  margin-bottom: 16px;
-  white-space: pre-wrap;
-  background: rgba(0,0,0,0.2);
-  padding: 10px;
-  border: 2px solid rgba(255,255,255,0.05);
+.chat-avatar--hari {
+  border-color: rgba(31, 157, 99, 0.32);
 }
 
-/* チャット */
-.chat-bubble {
-  border: 2px solid;
-  padding: 12px;
-  margin-bottom: 8px;
-  font-size: 0.85em;
-  line-height: 1.6;
-  white-space: pre-wrap;
+.chat-avatar--koki {
+  border-color: rgba(244, 200, 96, 0.45);
 }
 
-.chat-hari {
-  background: rgba(93,140,62,0.15);
-  border-color: var(--grass-dark);
-  margin-right: 16px;
-}
-
-.chat-hari::before {
-  content: '🤖 hari';
-  display: block;
-  font-weight: 700;
-  font-size: 0.8em;
-  margin-bottom: 4px;
-  color: var(--emerald);
-}
-
-.chat-koki {
-  background: rgba(252,219,5,0.1);
-  border-color: #d4a800;
-  margin-left: 16px;
-}
-
-.chat-koki::before {
-  content: '⛏️ じぶん';
-  display: block;
-  font-weight: 700;
-  font-size: 0.8em;
-  margin-bottom: 4px;
-  color: var(--gold);
-}
-
-/* 返信 */
-#modal-reply {
+.idea-reply {
   margin-top: 12px;
-  padding-top: 12px;
-  border-top: 2px solid var(--card-border);
+  padding-top: 14px;
+  border-top: 1px solid rgba(34, 42, 36, 0.08);
+}
+
+.empty {
+  padding: 18px 16px;
+  border-radius: 18px;
+  border: 1px dashed rgba(34, 42, 36, 0.14);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.chat-bubble {
+  max-width: 72%;
+  padding: 9px 14px;
+  border-radius: 20px;
+  font-size: 0.98rem;
+  line-height: 1.42;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  border: none;
+}
+
+/* Hari = 受信側: iOS グレー、左下の角を削って尻尾風に */
+.chat-hari {
+  background: #e9e9eb;
+  color: #1f261f;
+  border-bottom-left-radius: 6px;
+}
+
+/* Koki = 送信側: iMessage ブルー、右下の角を削って尻尾風に */
+.chat-koki {
+  background: linear-gradient(180deg, #3fa7fb 0%, #1e7fd6 100%);
+  color: #ffffff;
+  border-bottom-right-radius: 6px;
+}
+
+/* 連続して同じ人の行が続く時はアバターを非表示にして、バブルを詰める */
+.chat-row--hari:has(+ .chat-row--hari) .chat-avatar--hari,
+.chat-row--koki:has(+ .chat-row--koki) .chat-avatar--koki {
+  visibility: hidden;
+}
+
+.chat-row--hari:has(+ .chat-row--hari) .chat-hari {
+  border-bottom-left-radius: 20px;
+}
+.chat-row--hari + .chat-row--hari .chat-hari {
+  border-top-left-radius: 6px;
+}
+
+.chat-row--koki:has(+ .chat-row--koki) .chat-koki {
+  border-bottom-right-radius: 20px;
+}
+.chat-row--koki + .chat-row--koki .chat-koki {
+  border-top-right-radius: 6px;
 }
 
 .reply-buttons {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-.btn-go {
+.btn-build,
+.btn-discussion {
   flex: 1;
-  padding: 10px;
-  background: var(--emerald);
-  border: 3px solid #0fa84a;
-  color: #1a1008;
-  font-weight: 700;
-  font-family: 'DotGothic16', monospace;
-  text-shadow: none;
-  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
+  min-height: 52px;
+  border-radius: 16px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-soft);
 }
 
-.btn-send {
-  flex: 1;
-  padding: 10px;
-  background: var(--diamond);
-  border: 3px solid #3ab8c8;
-  color: #1a1008;
-  font-weight: 700;
-  font-family: 'DotGothic16', monospace;
-  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
+.btn-build {
+  background: linear-gradient(135deg, #32bf7d, #149f5d);
+  color: #fffdf8;
 }
 
-/* 空 */
-.empty {
-  text-align: center;
-  color: var(--text-dim);
-  padding: 20px;
-  font-size: 0.85em;
+.btn-discussion {
+  background: linear-gradient(135deg, #ffffff, #eef5ff);
+  border: 1px solid rgba(72, 154, 214, 0.18);
+  color: var(--ink);
+}
+
+@media (max-width: 1080px) {
+  body {
+    padding: 18px;
+  }
+
+  header,
+  main {
+    max-width: 960px;
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    padding: 14px;
+  }
+
+  header {
+    padding: 24px 22px;
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  .idea-progress-label {
+    font-size: 0.68rem;
+  }
+
+  .chat-bubble {
+    max-width: 85%;
+  }
+
+  .reply-buttons {
+    flex-direction: column;
+  }
 }

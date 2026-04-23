@@ -1,153 +1,310 @@
 const API = '/api';
-let currentIssue = null;
-let progressTimer = null;
+let resumeRefreshTimer = null;
+let latestBuild = null;
 
 // --- 起動 ---
 document.addEventListener('DOMContentLoaded', () => {
-  loadStats();
   loadIdeas();
-  loadBuild();
-  loadProgress();
 });
 
-// --- いまここステップ ---
-async function loadProgress() {
-  try {
-    const res = await fetch(`${API}/progress`);
-    const p = await res.json();
-    renderProgress(p);
+// iPad の PWA/復帰では古い DOM がそのまま見えることがあるので、
+// 前面復帰時に最新状態を取り直す。
+window.addEventListener('focus', scheduleResumeRefresh);
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) scheduleResumeRefresh();
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) scheduleResumeRefresh();
+});
 
-    // 完了していない間は 8 秒ごとにポーリング
-    if (progressTimer) clearTimeout(progressTimer);
-    if (p.step < 5) {
-      progressTimer = setTimeout(loadProgress, 8000);
-    }
-  } catch (e) {
-    console.error('progress error:', e);
-  }
-}
-
-function renderProgress(p) {
-  const card = document.getElementById('actor-card');
-  const avatar = document.getElementById('actor-avatar');
-  const name = document.getElementById('actor-name');
-  const action = document.getElementById('actor-action');
-
-  // step と loading から「誰が」「何をしてる」を決める
-  // step 1: 晄希が書く (idle)
-  // step 2 + loading: hari が読んでる (working)
-  // step 2 + !loading: 晄希の返事待ち
-  // step 3: hari が作ってる (working)
-  // step 4: hari がビルド中 (working)
-  // step 5: 晄希が遊べる
-  let actor, avatarIcon, actorName, msg, working;
-
-  if (p.step === 1) {
-    actor = 'koki'; avatarIcon = '⛏️'; actorName = '晄希';
-    msg = 'アイデアを書いてね'; working = false;
-  } else if (p.step === 2 && p.loading) {
-    actor = 'hari'; avatarIcon = '🤖'; actorName = 'hari';
-    msg = 'アイデアを読んでるよ...'; working = true;
-  } else if (p.step === 2) {
-    actor = 'koki'; avatarIcon = '⛏️'; actorName = '晄希';
-    msg = 'hari の返事を読んで Go！を押そう'; working = false;
-  } else if (p.step === 3) {
-    actor = 'hari'; avatarIcon = '🔨'; actorName = 'hari';
-    msg = '作ってるよ！ あとちょっと'; working = true;
-  } else if (p.step === 4) {
-    actor = 'hari'; avatarIcon = '📦'; actorName = 'hari';
-    msg = 'ビルド中...'; working = true;
-  } else {
-    actor = 'koki'; avatarIcon = '🎮'; actorName = '晄希';
-    msg = '遊べるよ！ ⬇️ のボタンで起動'; working = false;
-  }
-
-  card.dataset.actor = actor;
-  card.dataset.working = working;
-  avatar.textContent = avatarIcon;
-  name.textContent = actorName;
-  action.textContent = msg;
-
-  // プログレスバー
-  const bar = document.getElementById('progress-bar');
-  const fill = document.getElementById('progress-fill');
-  bar.dataset.step = p.step;
-  // 5 段階: step 1→0%, 2→25%, 3→50%, 4→75%, 5→100%
-  const pct = ((p.step - 1) / 4) * 100;
-  fill.style.width = pct + '%';
-  document.querySelectorAll('.tick').forEach(t => {
-    const s = Number(t.dataset.step);
-    t.classList.toggle('done', s < p.step);
-    t.classList.toggle('current', s === p.step);
-  });
-
-  // 新しいアイデアを書けるのは step 1（まだアイデアなし）と step 5（完成）のときだけ。
-  // それ以外（hari 作業中 / Go 待ち）は write-section を隠して混乱を防ぐ。
-  const writeSection = document.getElementById('write-section');
-  if (writeSection) {
-    writeSection.style.display = (p.step === 1 || p.step === 5) ? '' : 'none';
-  }
+function scheduleResumeRefresh() {
+  if (resumeRefreshTimer) clearTimeout(resumeRefreshTimer);
+  resumeRefreshTimer = setTimeout(() => {
+    refreshAfterAction().catch((e) => console.error('resume refresh error:', e));
+  }, 150);
 }
 
 // Build Release が出たら進行中のステップを即反映
 async function refreshAfterAction() {
   await loadIdeas();
-  await loadStats();
-  await loadProgress();
-  await loadBuild();
 }
 
-// --- 冒険者ステータス ---
-async function loadStats() {
-  try {
-    const res = await fetch(`${API}/stats`);
-    const stats = await res.json();
-    document.getElementById('level').textContent = stats.level;
-    document.getElementById('total-ideas').textContent = stats.total_ideas;
-    document.getElementById('total-done').textContent = stats.total_completed;
-
-    // レベルに応じたアイコン
-    const icons = ['🗡️', '⚔️', '🛡️', '🏹', '🔮', '👑', '🐉', '⭐', '🌟', '💎'];
-    document.getElementById('level-icon').textContent = icons[Math.min(stats.level - 1, icons.length - 1)];
-  } catch (e) {
-    console.error('stats error:', e);
-  }
-}
-
-// --- アイデア一覧 ---
+// --- アイデア一覧（アコーディオン） ---
 async function loadIdeas() {
   try {
-    const res = await fetch(`${API}/ideas`);
-    const ideas = await res.json();
-    const container = document.getElementById('idea-list');
+    const [ideasRes, buildRes] = await Promise.all([
+      fetch(`${API}/ideas`, { cache: 'no-store' }),
+      fetch(`${API}/latest-build`, { cache: 'no-store' }),
+    ]);
+    const ideas = await ideasRes.json();
+    latestBuild = await buildRes.json();
 
+    const container = document.getElementById('idea-list');
     if (!ideas.length) {
-      container.innerHTML = '<p class="empty">まだアイデアがないよ。上に書いてみよう！</p>';
+      container.innerHTML = '<p class="empty">No ideas yet. Write one above!</p>';
       return;
     }
 
-    container.innerHTML = ideas.map(idea => {
-      const statusIcon = {
-        'waiting': '⏳',
-        'responded': '💬',
-        'implementing': '🔨',
-        'done': '✅'
-      }[idea.status] || '📝';
+    // 現在開いているアイデアは再レンダー後も維持する
+    const openIssue = container.querySelector('.idea-item.open')?.dataset?.issue;
 
-      const date = new Date(idea.created_at).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+    container.innerHTML = ideas.map(idea => renderIdeaItem(idea, latestBuild)).join('');
 
-      return `
-        <div class="idea-item" onclick="openIdea(${idea.github_issue_number})">
+    if (openIssue) {
+      const stillThere = container.querySelector(`.idea-item[data-issue="${openIssue}"]`);
+      if (stillThere) {
+        stillThere.classList.add('open');
+        stillThere.querySelector('.idea-details')?.setAttribute('aria-hidden', 'false');
+        renderIdeaDetails(Number(openIssue));
+      }
+    }
+  } catch (e) {
+    console.error('ideas error:', e);
+  }
+}
+
+function renderIdeaItem(idea, build) {
+  const phase = computeIdeaPhase(idea, build);
+  const statusIcon = {
+    'waiting': '⏳',
+    'responded': '💬',
+    'implementing': '🔨',
+    'done': '✅'
+  }[idea.status] || '📝';
+
+  const lastUpdated = new Date(idea.updated_at || idea.created_at)
+    .toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  const progressHtml = renderIdeaProgress(phase.steps);
+  const ctaHtml = renderIdeaCta(idea.github_issue_number, phase, build);
+
+  // 完成済み（playable）は summary 全体のトグル tap を外し、
+  // 🎮 Play と 💬 Chat を同サイズで横並び（教育上の等価な価値）
+  const isPlayable = phase.cta?.type === 'play';
+  const summaryClass = isPlayable ? 'idea-summary idea-summary--readonly' : 'idea-summary';
+  const summaryOnclick = isPlayable ? '' : `onclick="toggleIdea(${idea.github_issue_number})"`;
+  const rightHtml = isPlayable
+    ? ''  // 完成済みは右端に何も置かない（Play / Chat は下の行に配置）
+    : `<span class="idea-chevron" aria-hidden="true">▸</span>`;
+
+  // 完成済みは 💬 Chat + 🎮 Play を 2 列で表示
+  const actionsHtml = isPlayable
+    ? `<div class="idea-actions">
+         <button class="idea-cta idea-cta--chat" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number})">💬 Chat</button>
+         <a class="idea-cta idea-cta--play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">${phase.cta.label}</a>
+       </div>`
+    : ctaHtml;
+
+  return `
+    <div class="idea-item${isPlayable ? ' idea-item--playable' : ''}" data-issue="${idea.github_issue_number}" data-phase="${phase.current}">
+      <div class="${summaryClass}" ${summaryOnclick}>
+        <div class="idea-summary-main">
           <span class="idea-status">${statusIcon}</span>
           <div class="idea-info">
             <h3>${escapeHtml(idea.title)}</h3>
-            <div class="date">${date}</div>
+            <div class="date">📅 Updated ${lastUpdated}</div>
+          </div>
+          ${rightHtml}
+        </div>
+        ${actionsHtml}
+      </div>
+      <div class="idea-details" aria-hidden="true">${progressHtml}</div>
+    </div>
+  `;
+}
+
+// Returns phase state for progress bar + CTA.
+// steps: ['done' | 'current' | 'pending'] for [design, discussion, build, play]
+// current: which phase is currently active ('discussion' | 'build' | 'play' | 'complete')
+// cta: { type: 'build' | 'play' | null, label, url? }
+// statusPill: { icon, label } or null
+function computeIdeaPhase(idea, build) {
+  const steps = { design: 'done', discussion: 'pending', build: 'pending' };
+  let current = 'discussion';
+  let cta = null;
+  let statusPill = null;
+
+  const buildIsNewer = build?.available && build?.date
+    && new Date(build.date) > new Date(idea.updated_at || idea.created_at);
+
+  if (idea.status === 'waiting') {
+    steps.discussion = 'current';
+    current = 'discussion';
+    statusPill = { icon: '⏳', label: 'Hari is reading your idea...' };
+  } else if (idea.status === 'responded') {
+    steps.discussion = 'current';
+    current = 'discussion';
+    cta = { type: 'build', label: '🔨 Build' };
+  } else if (idea.status === 'implementing') {
+    steps.discussion = 'done';
+    if (buildIsNewer && build?.mcworld_url) {
+      steps.build = 'done';
+      current = 'complete';
+      cta = { type: 'play', label: '🎮 Play', url: build.mcworld_url };
+    } else {
+      steps.build = 'current';
+      current = 'build';
+      statusPill = { icon: '🔨', label: 'Hari is building...' };
+    }
+  } else if (idea.status === 'done') {
+    steps.discussion = 'done';
+    steps.build = 'done';
+    current = 'complete';
+    if (build?.mcworld_url) {
+      cta = { type: 'play', label: '🎮 Play', url: build.mcworld_url };
+    }
+  }
+
+  return { steps, current, cta, statusPill };
+}
+
+function renderIdeaProgress(steps) {
+  const entries = [
+    ['design', 'Koki Design'],
+    ['discussion', 'Discussion with Hari'],
+    ['build', 'Build with Hari'],
+  ];
+  return `
+    <div class="idea-progress" aria-label="Phase progress">
+      ${entries.map(([key, label]) => {
+        const state = steps[key];
+        return `<span class="idea-progress-step idea-progress-step--${state}">
+          <span class="idea-progress-icon"></span>
+          <span class="idea-progress-label">${label}</span>
+        </span>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderIdeaCta(issueNumber, phase, build) {
+  if (phase.cta?.type === 'play') {
+    return `<a class="idea-cta idea-cta--play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">${phase.cta.label}</a>`;
+  }
+  if (phase.cta?.type === 'build') {
+    return `<button class="idea-cta idea-cta--build" onclick="event.stopPropagation(); approveIdea(${issueNumber})">${phase.cta.label}</button>`;
+  }
+  if (phase.statusPill) {
+    return `<div class="idea-cta idea-cta--status"><span>${phase.statusPill.icon}</span> ${escapeHtml(phase.statusPill.label)}</div>`;
+  }
+  return '';
+}
+
+// iMessage 風のチャット行（アバター写真 + バブル）
+function renderChatRow(m) {
+  const photo = m.type === 'hari' ? '/photo-hari.png' : '/photo-koki.png';
+  const alt = m.type === 'hari' ? 'Hari' : 'Koki';
+  return `
+    <div class="chat-row chat-row--${m.type}">
+      <img class="chat-avatar chat-avatar--${m.type}" src="${photo}" alt="${alt}" loading="lazy">
+      <div class="chat-bubble chat-${m.type}">${escapeHtml(m.body)}</div>
+    </div>
+  `;
+}
+
+// "Go!" 相当 — Discussion → Build に進める
+async function approveIdea(issueNumber) {
+  try {
+    const res = await fetch(`${API}/reply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ issue_number: issueNumber, message: 'Go!' }),
+    });
+    if (res.ok) {
+      refreshAfterAction();
+    }
+  } catch (e) {
+    console.error('approve error:', e);
+  }
+}
+
+async function toggleIdea(issueNumber) {
+  const item = document.querySelector(`.idea-item[data-issue="${issueNumber}"]`);
+  if (!item) return;
+
+  const isOpen = item.classList.contains('open');
+  if (isOpen) {
+    item.classList.remove('open');
+    item.querySelector('.idea-details')?.setAttribute('aria-hidden', 'true');
+    return;
+  }
+
+  // 一度に一つだけ開く（New Idea カードは常時展開なので除外）
+  document.querySelectorAll('.idea-item.open').forEach(el => {
+    if (el.id === 'new-idea-card') return;
+    el.classList.remove('open');
+    el.querySelector('.idea-details')?.setAttribute('aria-hidden', 'true');
+  });
+
+  item.classList.add('open');
+  const details = item.querySelector('.idea-details');
+  details.setAttribute('aria-hidden', 'false');
+
+  await renderIdeaDetails(issueNumber);
+}
+
+async function renderIdeaDetails(issueNumber) {
+  const item = document.querySelector(`.idea-item[data-issue="${issueNumber}"]`);
+  if (!item) return;
+  const details = item.querySelector('.idea-details');
+  if (!details) return;
+
+  try {
+    const res = await fetch(`${API}/ideas/${issueNumber}`, { cache: 'no-store' });
+    const data = await res.json();
+
+    // 最新ステータスに基づいた進捗を再計算してトグル内の先頭に表示
+    const phase = computeIdeaPhase(data.idea || {}, latestBuild);
+    const progressHtml = renderIdeaProgress(phase.steps);
+
+    const messages = [];
+    for (const h of (data.hari || [])) messages.push({ type: 'hari', body: h.body, time: h.created_at });
+    for (const k of (data.koki || [])) messages.push({ type: 'koki', body: k.body, time: k.created_at });
+    messages.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+    // Koki Design グループ: Title + Description を値だけプレーン表示
+    const designGroup = `
+      <section class="idea-group">
+        <h4 class="idea-group-title">🎨 Koki Design</h4>
+        <div class="idea-title-display">${escapeHtml(data.idea?.title || '')}</div>
+        <div class="idea-body">${escapeHtml(data.idea?.body || '')}</div>
+      </section>
+    `;
+
+    // Discussion with Hari グループ: Chat + Reply
+    const chatContent = messages.length === 0
+      ? '<p class="empty">⏳ Hari is reading it. Please wait...</p>'
+      : `<div class="idea-chat">${messages.map(m => renderChatRow(m)).join('')}</div>`;
+
+    // Build（承認）は summary の primary CTA にあるので、ここは修正返信だけ。
+    // 完成したアイデアには返信フォームを出さない。
+    const canReply = data.hari && data.hari.length > 0
+      && data.idea?.status !== 'implementing' && data.idea?.status !== 'done';
+    const replyContent = canReply
+      ? `
+        <div class="idea-reply">
+          <p class="field-kicker">Reply</p>
+          <textarea id="reply-text-${issueNumber}" rows="3" placeholder="hari に変えたい所を伝える..."></textarea>
+          <div class="reply-buttons">
+            <button class="btn-discussion" onclick="sendReply(${issueNumber})">💬 Discussion</button>
           </div>
         </div>
-      `;
-    }).join('');
+      `
+      : '';
+
+    const discussionGroup = `
+      <section class="idea-group">
+        <h4 class="idea-group-title">💬 Discussion with Hari</h4>
+        ${chatContent}
+        ${replyContent}
+      </section>
+    `;
+
+    details.innerHTML = progressHtml + designGroup + discussionGroup;
   } catch (e) {
-    console.error('ideas error:', e);
+    // エラー時も進捗は残す
+    const existingProgress = details.querySelector('.idea-progress')?.outerHTML || '';
+    details.innerHTML = existingProgress + '<p class="empty">Could not load this idea.</p>';
   }
 }
 
@@ -162,13 +319,13 @@ async function submitIdea() {
   const body = bodyEl.value.trim();
 
   if (!title || !body) {
-    statusEl.textContent = 'タイトルと内容を書いてね！';
+    statusEl.textContent = 'Please write a title and details.';
     statusEl.style.color = '#e94560';
     return;
   }
 
   btn.disabled = true;
-  statusEl.textContent = '送信中...';
+  statusEl.textContent = 'Sending...';
   statusEl.style.color = '#888';
 
   try {
@@ -179,149 +336,76 @@ async function submitIdea() {
     });
 
     if (res.ok) {
-      statusEl.textContent = '📮 送れたよ！hari が読んでくれるよ';
+      statusEl.textContent = 'Sent! Hari will read it soon.';
       statusEl.style.color = '#4ade80';
       titleEl.value = '';
       bodyEl.value = '';
       refreshAfterAction();
     } else {
       const err = await res.json();
-      statusEl.textContent = err.error || 'エラーが起きたよ';
+      statusEl.textContent = mapSubmitError(err.error);
       statusEl.style.color = '#e94560';
     }
   } catch (e) {
-    statusEl.textContent = 'ネットワークエラー';
+    statusEl.textContent = 'Network error.';
     statusEl.style.color = '#e94560';
   }
 
   btn.disabled = false;
 }
 
-// --- アイデア詳細（モーダル） ---
-async function openIdea(issueNumber) {
-  currentIssue = issueNumber;
-  const modal = document.getElementById('modal');
-  const chatEl = document.getElementById('modal-chat');
-
-  document.getElementById('modal-title').textContent = '読み込み中...';
-  document.getElementById('modal-body').textContent = '';
-  chatEl.innerHTML = '';
-  document.getElementById('modal-reply').style.display = 'none';
-  modal.style.display = 'flex';
-
-  try {
-    const res = await fetch(`${API}/ideas/${issueNumber}`);
-    const data = await res.json();
-
-    document.getElementById('modal-title').textContent = data.idea?.title || 'アイデア';
-    document.getElementById('modal-body').textContent = data.idea?.body || '';
-
-    // チャット表示
-    const messages = [];
-
-    // hari の返事
-    for (const h of (data.hari || [])) {
-      messages.push({ type: 'hari', body: h.body, time: h.created_at });
-    }
-
-    // 晄希の返事
-    for (const k of (data.koki || [])) {
-      messages.push({ type: 'koki', body: k.body, time: k.created_at });
-    }
-
-    // 時系列ソート
-    messages.sort((a, b) => new Date(a.time) - new Date(b.time));
-
-    if (messages.length === 0) {
-      chatEl.innerHTML = '<p class="empty">⏳ hari が読んでるよ、ちょっと待ってね...</p>';
-    } else {
-      chatEl.innerHTML = messages.map(m =>
-        `<div class="chat-bubble chat-${m.type}">${escapeHtml(m.body)}</div>`
-      ).join('');
-    }
-
-    // 返信フォーム表示（hari が返事済みなら）
-    if (data.hari && data.hari.length > 0) {
-      document.getElementById('modal-reply').style.display = 'block';
-      document.getElementById('reply-text').value = '';
-    }
-
-  } catch (e) {
-    document.getElementById('modal-title').textContent = 'エラー';
-    chatEl.innerHTML = '<p class="empty">読み込みに失敗したよ</p>';
-  }
-}
-
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-  currentIssue = null;
-}
-
-// モーダル外クリックで閉じる
-document.getElementById('modal')?.addEventListener('click', (e) => {
-  if (e.target.classList.contains('modal')) closeModal();
-});
-
 // --- 返信送信 ---
-async function sendReply(preset) {
-  const message = preset || document.getElementById('reply-text').value.trim();
-  if (!message || !currentIssue) return;
+async function sendReply(issueNumber, preset) {
+  const textarea = document.getElementById(`reply-text-${issueNumber}`);
+  const message = preset || (textarea && textarea.value.trim());
+  if (!message) return;
 
   try {
     const res = await fetch(`${API}/reply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ issue_number: currentIssue, message })
+      body: JSON.stringify({ issue_number: issueNumber, message })
     });
 
     if (res.ok) {
-      // チャットに追加
-      const chatEl = document.getElementById('modal-chat');
-      chatEl.innerHTML += `<div class="chat-bubble chat-koki">${escapeHtml(message)}</div>`;
-      document.getElementById('reply-text').value = '';
+      const item = document.querySelector(`.idea-item[data-issue="${issueNumber}"]`);
+      const chatEl = item?.querySelector('.idea-chat');
+      const details = item?.querySelector('.idea-details');
+
+      // 楽観的に自分の返信を追加
+      const rowHtml = renderChatRow({ type: 'koki', body: message });
+      if (chatEl) {
+        chatEl.insertAdjacentHTML('beforeend', rowHtml);
+      } else if (details) {
+        details.insertAdjacentHTML('beforeend',
+          `<div class="idea-chat">${rowHtml}</div>`);
+      }
+      if (textarea) textarea.value = '';
 
       if (/^(go|Go|GO|いいよ|OK|ok|おねがい|やって)/i.test(message)) {
-        chatEl.innerHTML += '<p class="empty">🔨 hari が作り始めるよ！できたら教えるね</p>';
-        document.getElementById('modal-reply').style.display = 'none';
+        const replyEl = item?.querySelector('.idea-reply');
+        if (replyEl) replyEl.style.display = 'none';
+        const chat2 = item?.querySelector('.idea-chat');
+        if (chat2) {
+          chat2.insertAdjacentHTML('beforeend',
+            '<p class="empty">🔨 Hari is starting now. I will let you know when it is ready.</p>');
+        }
       }
 
-      refreshAfterAction();
     }
   } catch (e) {
     console.error('reply error:', e);
   }
 }
 
-// --- 最新ビルド ---
-async function loadBuild() {
-  try {
-    const res = await fetch(`${API}/latest-build`);
-    const build = await res.json();
-    const container = document.getElementById('build-info');
-
-    if (!build.available) {
-      container.innerHTML = '<p class="empty">まだビルドがないよ</p>';
-      return;
-    }
-
-    const date = new Date(build.date).toLocaleDateString('ja-JP');
-    let html = '';
-
-    if (build.mcworld_url) {
-      html += `<a href="${build.mcworld_url}" download class="build-btn play">
-        🎮 iPad で遊ぶ
-        <span class="sub">タップすると Minecraft がひらくよ</span>
-      </a>`;
-    }
-    if (build.mcaddon_url) {
-      html += `<a href="${build.mcaddon_url}" download class="build-btn mcaddon">🧩 アドオンだけ DL</a>`;
-    }
-
-    html += `<p class="build-version">${build.version} ・ ${date}</p>`;
-    container.innerHTML = html;
-  } catch (e) {
-    console.error('build error:', e);
+function mapSubmitError(errorMessage) {
+  if (errorMessage === 'タイトルと内容を書いてね') {
+    return 'Please write a title and details.';
   }
+  if (errorMessage === 'Issue 作成に失敗しました') {
+    return 'Could not create the idea.';
+  }
+  return errorMessage || 'Something went wrong.';
 }
 
 // --- ユーティリティ ---

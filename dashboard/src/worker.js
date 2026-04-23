@@ -8,12 +8,34 @@ export default {
     }
 
     // Static assets handled by [assets] in wrangler.toml
-    return env.ASSETS.fetch(request);
+    const res = await env.ASSETS.fetch(request);
+
+    // HTML は毎回サーバに取りに行かせる（PWA / Safari のキャッシュ詰まり対策）
+    // CSS/JS は URL に ?v=... のキャッシュバスターが付いているのでそのまま
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('text/html')) {
+      const headers = new Headers(res.headers);
+      headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+      headers.set('Pragma', 'no-cache');
+      headers.set('Expires', '0');
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+    }
+    return res;
   }
 };
 
 async function handleAPI(url, request, env) {
-  const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+    'Pragma': 'no-cache'
+  };
+  const githubReleaseHeaders = {
+    'User-Agent': 'KokiAdventureNote',
+    'Accept': 'application/vnd.github.v3+json',
+    ...(env.GITHUB_TOKEN ? { 'Authorization': `Bearer ${env.GITHUB_TOKEN}` } : {})
+  };
 
   try {
     // POST /api/ideas — 新しいアイデアを投稿
@@ -166,12 +188,7 @@ async function handleAPI(url, request, env) {
     if (url.pathname === '/api/latest-build' && request.method === 'GET') {
       const res = await fetch(
         `https://api.github.com/repos/${env.GITHUB_REPO}/releases?per_page=1`,
-        {
-          headers: {
-            'User-Agent': 'KokiAdventureNote',
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        }
+        { headers: githubReleaseHeaders }
       );
       const releases = await res.json();
       const rel = releases[0];
@@ -226,12 +243,7 @@ async function handleAPI(url, request, env) {
       // 最新のビルド
       const relRes = await fetch(
         `https://api.github.com/repos/${env.GITHUB_REPO}/releases?per_page=1`,
-        {
-          headers: {
-            'User-Agent': 'KokiAdventureNote',
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        }
+        { headers: githubReleaseHeaders }
       );
       const releases = await relRes.json();
       const rel = releases[0];

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Koki's Note</title>
+  <title>Koki Designing Minecraft</title>
 
   <!-- アイコン -->
   <link rel="icon" type="image/png" href="/icon.png">
@@ -17,89 +17,75 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Koki's Note">
+  <meta name="apple-mobile-web-app-title" content="Koki Designing Minecraft">
 
-  <link rel="stylesheet" href="/style.css">
+  <!-- ブランド用の手書き練習フォント（Playwrite NZ Guides: 点線の練習補助線あり） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/style.css?v=20260423-ui38">
 </head>
 <body>
   <!-- ヘッダー -->
   <header id="header">
-    <div class="level-badge">
-      <span id="level-icon">⚔️</span>
-      <span>Lv.<span id="level">1</span></span>
-    </div>
-    <h1>Koki's Note</h1>
-    <div class="stats">
-      <span>📝 <span id="total-ideas">0</span></span>
-      <span>✅ <span id="total-done">0</span></span>
+    <div class="brand">
+      <img src="/icon.png" alt="" class="brand-icon">
+      <h1 class="brand-title">
+        <span class="brand-line">Koki</span>
+        <span class="brand-line">Designing</span>
+        <span class="brand-line brand-line--project">Minecraft</span>
+      </h1>
     </div>
   </header>
 
-  <div class="layout">
-    <!-- 左サイド: いま作業中のひと -->
-    <aside id="progress-rail">
-      <h3 class="rail-title">いま作業中</h3>
-      <div class="actor-card" id="actor-card" data-actor="koki" data-working="false">
-        <div class="actor-avatar" id="actor-avatar">⛏️</div>
-        <div class="actor-name" id="actor-name">晄希</div>
-        <div class="actor-action" id="actor-action">アイデアを書いてね</div>
+  <main>
+    <!-- 新しいアイデアを書く -->
+    <section id="new-idea-section" class="card">
+      <div class="section-head">
+        <p class="section-kicker">Start here</p>
+        <h2>New Idea</h2>
       </div>
 
-      <!-- ステッププログレスバー -->
-      <div class="progress-bar" id="progress-bar" data-step="1">
-        <div class="progress-fill" id="progress-fill"></div>
-        <div class="progress-ticks">
-          <div class="tick" data-step="1"><span>✍️</span></div>
-          <div class="tick" data-step="2"><span>🤖</span></div>
-          <div class="tick" data-step="3"><span>🔨</span></div>
-          <div class="tick" data-step="4"><span>📦</span></div>
-          <div class="tick" data-step="5"><span>🎮</span></div>
+      <div id="new-idea-card" class="idea-item idea-item-new open">
+        <div class="idea-summary">
+          <div class="idea-progress" aria-label="Phase progress">
+            <span class="idea-progress-step idea-progress-step--current">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Koki Design</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--pending">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Discussion with Hari</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--pending">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Build with Hari</span>
+            </span>
+          </div>
+        </div>
+        <div class="idea-details" aria-hidden="false">
+          <p class="field-kicker">Title</p>
+          <input type="text" id="idea-title" placeholder="タイトル（例：ドラゴンを追加したい）" maxlength="80">
+          <p class="field-kicker">Description</p>
+          <textarea id="idea-body" rows="6" placeholder="どんなことをしたい？&#10;&#10;だれが出てくる？&#10;なにが起きる？&#10;ゲームの中でどうなる？"></textarea>
+          <button id="submit-btn" onclick="submitIdea()">🎨 Design New Idea</button>
+          <p id="submit-status" class="status-msg"></p>
         </div>
       </div>
-    </aside>
+    </section>
 
-    <!-- メイン -->
-    <main>
-      <!-- 新しいアイデアを書く -->
-      <section id="write-section" class="card">
-        <h2>💡 新しいアイデア</h2>
-        <input type="text" id="idea-title" placeholder="タイトル（例：ドラゴンを追加したい）" maxlength="80">
-        <textarea id="idea-body" rows="6" placeholder="どんなことをしたい？&#10;&#10;だれが出てくる？&#10;なにが起きる？&#10;ゲームの中でどうなる？"></textarea>
-        <button id="submit-btn" onclick="submitIdea()">📮 送る！</button>
-        <p id="submit-status" class="status-msg"></p>
-      </section>
-
-      <!-- hari との会話 -->
-      <section id="conversations" class="card">
-        <h2>💬 hari との会話</h2>
-        <div id="idea-list"></div>
-      </section>
-
-      <!-- 最新ビルド -->
-      <section id="build-section" class="card">
-        <h2>🎮 iPad で遊ぶ</h2>
-        <div id="build-info">読み込み中...</div>
-      </section>
-    </main>
-  </div>
-
-  <!-- アイデア詳細モーダル -->
-  <div id="modal" class="modal" style="display:none">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()">✕</button>
-      <h2 id="modal-title"></h2>
-      <div id="modal-body"></div>
-      <div id="modal-chat"></div>
-      <div id="modal-reply" style="display:none">
-        <textarea id="reply-text" rows="3" placeholder="hari に返事を書く..."></textarea>
-        <div class="reply-buttons">
-          <button class="btn-go" onclick="sendReply('Go！')">👍 Go！</button>
-          <button class="btn-send" onclick="sendReply()">📤 送る</button>
-        </div>
+    <!-- Koki のアイデア一覧 -->
+    <section id="conversations" class="card">
+      <div class="section-head">
+        <p class="section-kicker">Idea Archives</p>
+        <h2>Koki's Ideas</h2>
       </div>
-    </div>
-  </div>
 
-  <script src="/app.js"></script>
+      <div id="idea-list"></div>
+    </section>
+  </main>
+
+  <script src="/app.js?v=20260423-ui38"></script>
 </body>
 </html>
