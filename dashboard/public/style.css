@@ -505,6 +505,7 @@ button {
   border: none;
 }
 
+.submit-btn,
 #submit-btn {
   width: 100%;
   min-height: 60px;
@@ -534,16 +535,19 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.65);
 }
 
-#submit-btn:hover {
+#submit-btn:hover,
+.submit-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 30px rgba(0, 0, 0, 0.22);
 }
 
-#submit-btn:active {
+#submit-btn:active,
+.submit-btn:active {
   transform: translateY(0);
 }
 
-#submit-btn:disabled {
+#submit-btn:disabled,
+.submit-btn:disabled {
   opacity: 0.55;
   cursor: default;
 }
@@ -651,6 +655,10 @@ button {
   gap: 8px;
 }
 
+.idea-discussion-form .submit-btn {
+  width: 100%;
+}
+
 .idea-discussion-input {
   width: 100%;
   resize: vertical;
@@ -669,11 +677,6 @@ button {
   outline: none;
   border-color: rgba(31, 157, 99, 0.45);
   box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.idea-discussion-form .btn-discussion {
-  align-self: flex-end;
-  min-width: 160px;
 }
 
 .flow-template-link {
