@@ -192,6 +192,13 @@
     (function () {
       const buttons = document.querySelectorAll('.flow-control-btn');
       const stages = document.querySelectorAll('.flow-stage');
+      const stageHeads = document.querySelectorAll('.flow-stage .section-head');
+
+      function keepNewHeaderStyle() {
+        stageHeads.forEach((head) => {
+          head.classList.add('section-head--new');
+        });
+      }
 
       function setActiveStage(state) {
         stages.forEach((stage) => {
@@ -201,6 +208,9 @@
         buttons.forEach((btn) => {
           btn.classList.toggle('is-active', btn.dataset.stage === state);
         });
+
+        // 一時状態に引きずられず、完了まで section-head--new を保持する
+        keepNewHeaderStyle();
       }
 
       buttons.forEach((button) => {
@@ -209,6 +219,8 @@
           setActiveStage(state);
         });
       });
+
+      keepNewHeaderStyle();
     })();
   </script>
 </body>
