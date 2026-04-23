@@ -7,7 +7,7 @@ pack.description=Koki's first adventure - resources
 entity.story:flying_horse.name=空飛ぶ馬
 entity.story:cloud_villager.name=雲の村人
 entity.story:fire_dragon.name=ファイアドラゴン
-entity.story:test_completion_dragon.name=§6勝利のドラゴン
+entity.story:test_completion_dragon.name=§6装飾斧ドラゴン
 
 ## アイテム名
 item.story:cloud_fragment.name=§f雲のかけら

@@ -11,13 +11,13 @@
             {
               "function": "enchant_with_levels",
               "levels": {
-                "min": 20,
-                "max": 30
+                "min": 25,
+                "max": 35
               }
             },
             {
               "function": "set_name",
-              "name": "§6§l装飾斧「勝利の証」"
+              "name": "§6§l装飾斧「勝利の証」§r\n§e テスト完了を祝福する斧"
             }
           ]
         }

@@ -101,6 +101,7 @@
         "run_command": {
           "command": [
             "/tellraw @a[r=30] {\"rawtext\":[{\"text\":\"§6§l=== テスト完了演出開始！ ===§r\"}]}",
+            "/tellraw @a[r=30] {\"rawtext\":[{\"text\":\"§e装飾斧を持った巨大ドラゴンが勝利を祝福している！§r\"}]}",
             "/playsound mob.enderdragon.growl @a[r=30]",
             "/particle minecraft:flame_particle ~ ~2 ~ 3 3 3 0.2 50",
             "/particle minecraft:lava_particle ~ ~2 ~ 2 2 2 0.1 30",
@@ -116,10 +117,12 @@
             "/particle minecraft:lava_particle ~0 ~18 ~0 12 2 8 0.05 100",
             "/particle minecraft:campfire_smoke_particle ~0 ~25 ~0 20 5 10 0.02 150",
             "/particle minecraft:totem_particle ~0 ~15 ~0 8 8 8 0.3 80",
+            "/particle minecraft:end_rod ~0 ~22 ~0 5 3 5 0.2 60",
             "/playsound mob.enderdragon.fireball @a[r=40]",
+            "/playsound ui.toast.challenge_complete @a[r=40]",
             "/tellraw @a[r=40] {\"rawtext\":[{\"text\":\"§c§l🔥 テスト完了 🔥§r\"}]}",
             "/title @a[r=40] title §6§lテスト完了！",
-            "/title @a[r=40] subtitle §r§e勇者よ、よくやった！"
+            "/title @a[r=40] subtitle §r§e装飾斧ドラゴンが勝利を祝福している！"
           ]
         }
       }
