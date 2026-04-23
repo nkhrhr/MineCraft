@@ -34,6 +34,50 @@ function loadSchema(name) {
   }
 }
 
+// ---- Blockception スキーマのローカルパッチ ----
+// vendored ファイル本体は触らず、ロード時に必要な補完だけを加える。
+// Blockception snapshot を更新しても衝突しない。
+// 新しいパッチを足したい時は applyEntitySchemaPatches に追記する。
+function applyEntitySchemaPatches(schema) {
+  const defs = schema && schema.definitions;
+  if (!defs) return;
+
+  for (const def of Object.values(defs)) {
+    if (!def || typeof def !== 'object') continue;
+
+    // (1) components バッグ（pushable_by_entity を持つ definition）に
+    //     legacy の minecraft:pushable を追加。
+    //     Bedrock は今も受け入れるが Blockception schema は新しい split 形
+    //     （pushable_by_block / pushable_by_entity）しか載せていない。
+    if (def.properties &&
+        def.properties['minecraft:pushable_by_entity'] &&
+        !def.properties['minecraft:pushable']) {
+      def.properties['minecraft:pushable'] = {
+        type: 'object',
+        additionalProperties: false,
+        description: 'Legacy pushable (Blockception schema にまだ無いが Bedrock 実機で有効)',
+        properties: {
+          is_pushable: { type: 'boolean' },
+          is_pushable_by_piston: { type: 'boolean' },
+        },
+      };
+    }
+
+    // (2) minecraft:behavior.circle_around_anchor の height_range を追加。
+    //     phantom.json などの Vanilla サンプルで使われる正当なパラメータ
+    //     だが Blockception schema に反映されていない。range 系は
+    //     definitions.H（2 要素数値配列）と同じ形状で OK。
+    if (def.title === 'Circle Around Anchor' &&
+        def.properties &&
+        !def.properties.height_range) {
+      def.properties.height_range = {
+        $ref: '#/definitions/H',
+        description: 'Vertical range. Blockception 未追従のためローカル追加。',
+      };
+    }
+  }
+}
+
 const schemaDefs = [
   { key: 'manifest', file: 'manifest.schema.json' },
   { key: 'entity',   file: 'entity.schema.json' },
@@ -45,6 +89,7 @@ const validators = {};
 for (const { key, file } of schemaDefs) {
   const schema = loadSchema(file);
   if (!schema) continue;
+  if (key === 'entity') applyEntitySchemaPatches(schema);
   try {
     validators[key] = ajv.compile(schema);
   } catch (e) {
