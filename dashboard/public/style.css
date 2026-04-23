@@ -415,6 +415,91 @@ textarea:focus {
   opacity: 0.75;
 }
 
+/* <details>/<summary> で Hint & Tips を開閉する時のリセット */
+.tips-details {
+  margin-top: 14px;
+  text-align: right;
+}
+
+.tips-details > summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-block;
+  padding: 4px 0;
+}
+
+.tips-details > summary::-webkit-details-marker,
+.tips-details > summary::marker {
+  display: none;
+  content: '';
+}
+
+.tips-details > summary::before {
+  content: '💡 ';
+  margin-right: 2px;
+}
+
+.tips-details[open] > summary::before {
+  content: '💡 ';
+}
+
+.tips-content {
+  margin-top: 10px;
+  text-align: left;
+}
+
+/* Reflect セクション: 過去アイデア一覧 */
+.reflect-archive {
+  margin: 14px 0;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px dashed rgba(34, 42, 36, 0.16);
+  border-radius: 14px;
+}
+
+.reflect-archive-label {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #000000;
+  opacity: 0.7;
+}
+
+.reflect-archive-list {
+  margin: 0 0 10px;
+  padding: 0 0 0 22px;
+  list-style: decimal;
+}
+
+.reflect-archive-list li {
+  padding: 4px 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.reflect-archive-title {
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+}
+
+.reflect-archive-date {
+  font-size: 0.78rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.reflect-archive-hint {
+  margin: 10px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: #000000;
+}
+
 .tips-modal-overlay[hidden] {
   display: none;
 }
