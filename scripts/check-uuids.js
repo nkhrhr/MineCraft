@@ -23,14 +23,37 @@ check('RP module', rp.modules[0].uuid);
 
 // BP の dependency が RP header UUID を指しているか
 if (bp.dependencies && bp.dependencies.length > 0) {
-  const depUuid = bp.dependencies[0].uuid;
-  if (depUuid === rp.header.uuid) {
+  const dep = bp.dependencies[0];
+  if (dep.uuid === rp.header.uuid) {
     console.log(`✅ BP dependency → RP header UUID 一致`);
   } else {
-    console.error(`❌ BP dependency UUID (${depUuid}) ≠ RP header UUID (${rp.header.uuid})`);
+    console.error(`❌ BP dependency UUID (${dep.uuid}) ≠ RP header UUID (${rp.header.uuid})`);
+    ok = false;
+  }
+  // バージョンも揃っていないと、Bedrock はワールド起動時に RP を解決できない
+  const depVer = (dep.version || []).join('.');
+  const rpVer = (rp.header.version || []).join('.');
+  if (depVer === rpVer) {
+    console.log(`✅ BP dependency version (${depVer}) = RP header version`);
+  } else {
+    console.error(`❌ BP dependency version (${depVer}) ≠ RP header version (${rpVer})`);
     ok = false;
   }
 }
+
+// BP / RP 自身の header と modules の version も揃っていること
+function checkInternalVersions(label, m) {
+  const headerVer = (m.header.version || []).join('.');
+  for (const mod of (m.modules || [])) {
+    const modVer = (mod.version || []).join('.');
+    if (headerVer !== modVer) {
+      console.error(`❌ ${label}: header version (${headerVer}) ≠ modules version (${modVer})`);
+      ok = false;
+    }
+  }
+}
+checkInternalVersions('BP', bp);
+checkInternalVersions('RP', rp);
 
 // 全 UUID の重複チェック
 const allUuids = [bp.header.uuid, bp.modules[0].uuid, rp.header.uuid, rp.modules[0].uuid];

@@ -18,11 +18,19 @@ const newVersion = parts.join('.');
 vj.version = newVersion;
 fs.writeFileSync(versionFile, JSON.stringify(vj, null, 2) + '\n');
 
-// manifest.json のバージョンも同期
+// manifest.json のバージョンも同期（header, modules, dependencies まとめて）
 for (const mPath of [bpManifest, rpManifest]) {
   const m = JSON.parse(fs.readFileSync(mPath, 'utf8'));
   m.header.version = parts;
-  m.modules[0].version = parts;
+  if (Array.isArray(m.modules)) {
+    for (const mod of m.modules) mod.version = parts;
+  }
+  if (Array.isArray(m.dependencies)) {
+    for (const dep of m.dependencies) {
+      // 内部パック（BP↔RP の相互依存）は同じリポジトリのバージョンに揃える
+      dep.version = parts;
+    }
+  }
   fs.writeFileSync(mPath, JSON.stringify(m, null, 2) + '\n');
 }
 

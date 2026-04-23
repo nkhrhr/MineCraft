@@ -8,7 +8,8 @@
     "pack": "node scripts/pack.js",
     "create-world": "node scripts/create-world.js",
     "bump-version": "node scripts/bump-version.js",
-    "release": "npm run validate && npm run pack && npm run create-world",
+    "verify-mcworld": "node scripts/verify-mcworld.js",
+    "release": "npm run validate && npm run check-uuids && npm run pack && npm run create-world && npm run verify-mcworld",
     "test": "node --test tests/"
   },
   "devDependencies": {

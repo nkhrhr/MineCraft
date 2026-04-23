@@ -34,6 +34,9 @@ jobs:
       - name: Validate JSON
         run: npm run validate
 
+      - name: Check UUID / version consistency (BP ↔ RP)
+        run: npm run check-uuids
+
       - name: Auto-increment version
         run: |
           node scripts/bump-version.js patch
@@ -47,6 +50,9 @@ jobs:
 
       - name: Create .mcworld
         run: node scripts/create-world.js
+
+      - name: Verify .mcworld is importable (fail-fast if broken)
+        run: npm run verify-mcworld
 
       - name: Upload release
         uses: softprops/action-gh-release@v2
