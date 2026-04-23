@@ -11,9 +11,9 @@ export default {
     const res = await env.ASSETS.fetch(request);
 
     // HTML は毎回サーバに取りに行かせる（PWA / Safari のキャッシュ詰まり対策）
-    // CSS/JS は URL に ?v=... のキャッシュバスターが付いているのでそのまま
+    // UI 更新を確実に反映するため、静的資産(JS/CSS)もキャッシュ無効化
     const ct = res.headers.get('content-type') || '';
-    if (ct.includes('text/html')) {
+    if (ct.includes('text/html') || ct.includes('text/css') || ct.includes('application/javascript') || ct.includes('text/javascript')) {
       const headers = new Headers(res.headers);
       headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
       headers.set('Pragma', 'no-cache');
