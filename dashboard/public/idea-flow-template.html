@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/style.css?v=20260424-ui17">
+  <link rel="stylesheet" href="/style.css?v=20260424-ui18">
   <style>
     .chat-thinking {
       display: inline-flex;
@@ -31,12 +31,29 @@
     }
 
     .chat-bubble:has(.chat-thinking) {
-      padding: 8px 14px;
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
       line-height: 1;
     }
 
     .chat-row:has(.chat-thinking) .chat-avatar {
       visibility: visible;
+    }
+
+    /* 長めのナレーション文は読みやすい幅に畳んで中央配置 */
+    .flow-template-page .idea-flow-note {
+      justify-content: center;
+      max-width: 32em;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .flow-template-page .idea-body {
+      max-width: 32em;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
     }
 
     .chat-thinking-label {
@@ -240,14 +257,7 @@
               <div class="idea-chat">
                 <div class="chat-row chat-row--hari">
                   <img class="chat-avatar chat-avatar--hari" src="/photo-hari.png" alt="Hari">
-                  <div class="chat-bubble chat-hari">
-                    <span class="chat-thinking">
-                      <span class="chat-thinking-label">Hari が考え中</span>
-                      <span class="chat-thinking-dots" aria-hidden="true">
-                        <span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span>
-                      </span>
-                    </span>
-                  </div>
+                  <div class="chat-bubble chat-hari"><span class="chat-thinking"><span class="chat-thinking-label">Hari が考え中</span><span class="chat-thinking-dots" aria-hidden="true"><span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span><span class="chat-thinking-dot">・</span></span></span></div>
                 </div>
                 <div class="chat-row chat-row--hari">
                   <img class="chat-avatar chat-avatar--hari" src="/photo-hari.png" alt="Hari">

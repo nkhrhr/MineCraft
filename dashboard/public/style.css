@@ -1483,7 +1483,7 @@ button {
 
 .chat-bubble {
   max-width: 72%;
-  padding: 12px 18px;
+  padding: 16px 20px;
   border-radius: 20px;
   font-size: 0.98rem;
   line-height: 1.85;
@@ -1514,18 +1514,13 @@ button {
   visibility: hidden;
 }
 
+/* 同一送信者が連続する時は最後のバブルだけに尻尾を残す（中間はすべて丸める） */
 .chat-row--hari:has(+ .chat-row--hari) .chat-hari {
   border-bottom-left-radius: 20px;
-}
-.chat-row--hari + .chat-row--hari .chat-hari {
-  border-top-left-radius: 6px;
 }
 
 .chat-row--koki:has(+ .chat-row--koki) .chat-koki {
   border-bottom-right-radius: 20px;
-}
-.chat-row--koki + .chat-row--koki .chat-koki {
-  border-top-right-radius: 6px;
 }
 
 .reply-buttons {
