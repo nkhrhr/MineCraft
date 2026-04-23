@@ -123,6 +123,26 @@ header {
   gap: var(--space-3);
 }
 
+.position-fixed {
+  position: fixed;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.end-0 {
+  right: 0;
+}
+
+.p-3 {
+  padding: 1rem;
+}
+
+.me-auto {
+  margin-right: auto;
+}
+
 .meta-row {
   display: flex;
   align-items: center;
@@ -630,6 +650,84 @@ button {
   font-weight: 700;
 }
 
+.toast-container {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 80;
+  width: min(330px, calc(100vw - 24px));
+  max-width: 100%;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.live-toast {
+  pointer-events: auto;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  width: 100%;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  visibility: hidden;
+}
+
+.live-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.live-toast .toast-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.toast-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.toast-title {
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.toast-close {
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: #000000;
+  display: grid;
+  place-items: center;
+}
+
+.toast-body {
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.live-toast small {
+  margin-left: auto;
+  font-size: 0.68rem;
+  color: #697068;
+}
+
 .idea-flow-note {
   display: flex;
   align-items: center;
@@ -954,6 +1052,31 @@ button {
   line-height: 1;
 }
 
+.idea-hari-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.35;
+}
+
+.idea-hari-status-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.idea-hari-status-loader {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+.idea-empty-status .idea-hari-status {
+  color: #000000;
+}
+
 .idea-info {
   flex: 1;
   min-width: 0;
@@ -1155,6 +1278,10 @@ button {
   font-size: 0.94rem;
   cursor: default;
   gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
 }
 
 .idea-cta:active {

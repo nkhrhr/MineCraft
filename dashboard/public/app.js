@@ -1,6 +1,7 @@
 const API = '/api';
 let resumeRefreshTimer = null;
 let latestBuild = null;
+let liveToastTimer = null;
 
 // フォント読み込み完了までロゴを非表示にしてから表示する。
 function revealBrandAfterFonts() {
@@ -32,6 +33,7 @@ revealBrandAfterFonts();
 document.addEventListener('DOMContentLoaded', () => {
   loadIdeas();
   initTipsModal();
+  initLiveToast();
 });
 
 // iPad の PWA/復帰では古い DOM がそのまま見えることがあるので、
@@ -83,6 +85,51 @@ function initTipsModal() {
       closeTipsModal();
     }
   });
+}
+
+function initLiveToast() {
+  const closeBtn = document.getElementById('liveToastClose');
+  if (!closeBtn) return;
+  closeBtn.addEventListener('click', hideLiveToast);
+}
+
+function showLiveToast({ title, message }) {
+  const toast = document.getElementById('liveToast');
+  const titleEl = document.getElementById('liveToastTitle');
+  const bodyEl = document.getElementById('liveToastBody');
+  const timeEl = document.getElementById('liveToastTime');
+  if (!toast || !titleEl || !bodyEl || !timeEl) return;
+
+  titleEl.textContent = title || 'Update';
+  bodyEl.textContent = message || '';
+  timeEl.textContent = 'now';
+  toast.hidden = false;
+  toast.classList.add('is-visible');
+
+  if (liveToastTimer) clearTimeout(liveToastTimer);
+  liveToastTimer = setTimeout(() => {
+    hideLiveToast();
+  }, 5000);
+}
+
+function hideLiveToast() {
+  const toast = document.getElementById('liveToast');
+  if (!toast) return;
+  toast.classList.remove('is-visible');
+  toast.hidden = true;
+}
+
+function renderHariStatusLine(message, { loader = true } = {}) {
+  const spinner = loader
+    ? `<span class="idea-flow-loader idea-hari-status-loader" aria-hidden="true"></span>`
+    : '';
+  return `
+    <span class="idea-hari-status">
+      <img class="idea-hari-status-avatar" src="/photo-hari.png" alt="Hari">
+      ${spinner}
+      <span>${escapeHtml(message)}</span>
+    </span>
+  `;
 }
 
 // Build Release が出たら進行中のステップを即反映
@@ -295,7 +342,7 @@ function renderIdeaCta(issueNumber, phase, build) {
     return `<button class="idea-cta idea-cta--build" onclick="event.stopPropagation(); approveIdea(${issueNumber})">${phase.cta.label}</button>`;
   }
   if (phase.statusPill) {
-    return `<div class="idea-cta idea-cta--status">${escapeHtml(phase.statusPill.label)}</div>`;
+    return `<div class="idea-cta idea-cta--status">${renderHariStatusLine(phase.statusPill.label)}</div>`;
   }
   return '';
 }
@@ -321,6 +368,10 @@ async function approveIdea(issueNumber) {
       body: JSON.stringify({ issue_number: issueNumber, message: 'Go!' }),
     });
     if (res.ok) {
+      showLiveToast({
+        title: 'Build request sent',
+        message: 'Hari is building your idea now.'
+      });
       refreshAfterAction();
     }
   } catch (e) {
@@ -395,7 +446,9 @@ async function renderIdeaDetails(issueNumber) {
 
     // Discussion with Hari グループ: Chat + Reply
     const chatContent = messages.length === 0
-      ? '<p class="empty">Hari is reading it. Please wait...</p>'
+      ? `<p class="empty idea-empty-status">
+          ${renderHariStatusLine('Hari is reading it. Please wait...')}
+        </p>`
       : `<div class="idea-chat">${messages.map(m => renderChatRow(m)).join('')}</div>`;
 
     // Build（承認）は summary の primary CTA にあるので、ここは修正返信だけ。
@@ -459,6 +512,10 @@ async function submitIdea() {
 
     if (res.ok) {
       statusEl.textContent = 'Sent! Hari will read it soon.';
+      showLiveToast({
+        title: 'Idea sent',
+        message: 'Hari is reading your idea now.'
+      });
       statusEl.style.color = '#000000';
       titleEl.value = '';
       bodyEl.value = '';
@@ -510,7 +567,9 @@ async function sendReply(issueNumber, preset) {
         const chat2 = item?.querySelector('.idea-chat');
         if (chat2) {
           chat2.insertAdjacentHTML('beforeend',
-            '<p class="empty">Hari is starting now. I will let you know when it is ready.</p>');
+            `<p class="empty idea-empty-status">
+              ${renderHariStatusLine('Hari is starting now. I will let you know when it is ready.', true)}
+            </p>`);
         }
       }
 

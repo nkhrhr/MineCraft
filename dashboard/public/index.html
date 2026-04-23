@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/style.css?v=20260423-ui80">
+  <link rel="stylesheet" href="/style.css?v=20260423-ui81">
 </head>
   <body>
   <!-- ヘッダー -->
@@ -131,6 +131,18 @@
     </div>
   </div>
 
-  <script src="/app.js?v=20260423-ui80"></script>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast live-toast" role="alert" aria-live="assertive" aria-atomic="true" hidden>
+      <div class="toast-header">
+        <img src="/photo-hari.png" class="toast-avatar" alt="Hari">
+        <strong class="me-auto toast-title" id="liveToastTitle">Update</strong>
+        <small id="liveToastTime">now</small>
+        <button id="liveToastClose" type="button" class="btn-close toast-close" aria-label="Close">×</button>
+      </div>
+      <div class="toast-body" id="liveToastBody"></div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=20260423-ui81"></script>
 </body>
 </html>
