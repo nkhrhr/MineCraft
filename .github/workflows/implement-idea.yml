@@ -11,33 +11,46 @@ permissions:
 
 jobs:
   implement:
-    # 晄希が "Go" "go" "いいよ" "OK" とコメントしたら実装開始
+    # 晄希本人のコメントだけ、かつ "Go" / "いいよ" などが独立したトークンで入っている時だけ発火
     if: >
       contains(github.event.issue.labels.*.name, 'story') &&
       github.event.issue.state == 'open' &&
-      (
-        contains(github.event.comment.body, 'Go') ||
-        contains(github.event.comment.body, 'go') ||
-        contains(github.event.comment.body, 'いいよ') ||
-        contains(github.event.comment.body, 'OK') ||
-        contains(github.event.comment.body, 'ok') ||
-        contains(github.event.comment.body, 'おねがい') ||
-        contains(github.event.comment.body, 'やって')
-      )
+      github.event.comment.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
+      - name: Go トリガー判定（境界マッチ）
+        id: check
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          node -e "
+            const raw = process.env.COMMENT_BODY || '';
+            const body = raw.trim();
+            // 語境界付き: 英字は \\b、日本語キーワードは周囲が境界 or 文字列端
+            const enRe = /\\b(go|ok)\\b[!！。\\.\\s、]*\$/i;
+            const jaRe = /(^|[\\s、。！!])(いいよ|おねがい|やって)([\\s、。！!.]|\$)/;
+            const match = enRe.test(body) || jaRe.test(body) || body === 'Go!' || body === 'Go！';
+            const fs = require('fs');
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, 'go=' + (match ? 'true' : 'false') + '\\n');
+            console.log('[go-check] body=' + JSON.stringify(body) + ' -> ' + match);
+          "
+
       - uses: actions/checkout@v4
+        if: steps.check.outputs.go == 'true'
 
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.go == 'true'
         with:
           node-version: '20'
 
       - name: Git 設定
+        if: steps.check.outputs.go == 'true'
         run: |
           git config user.name "arlt-story-bot"
           git config user.email "bot@arlt-story.dev"
 
       - name: Claude が実装
+        if: steps.check.outputs.go == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

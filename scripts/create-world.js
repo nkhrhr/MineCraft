@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+const { writeLevelDat } = require('./level-dat');
 
 const ROOT = path.resolve(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -39,7 +40,13 @@ async function main() {
   fs.mkdirSync(path.join(worldDir, 'behavior_packs'), { recursive: true });
   fs.mkdirSync(path.join(worldDir, 'resource_packs'), { recursive: true });
 
-  fs.writeFileSync(path.join(worldDir, 'levelname.txt'), '物語の世界');
+  const levelName = '物語の世界';
+  fs.writeFileSync(path.join(worldDir, 'levelname.txt'), levelName);
+
+  // Bedrock はワールド識別に level.dat を必須とするため最小構成で生成
+  writeLevelDat(path.join(worldDir, 'level.dat'), levelName);
+  // ゲーム内バックアップ用（起動時に読み込みエラーがあれば level.dat_old にフォールバック）
+  fs.copyFileSync(path.join(worldDir, 'level.dat'), path.join(worldDir, 'level.dat_old'));
 
   fs.writeFileSync(path.join(worldDir, 'world_behavior_packs.json'), JSON.stringify([
     { pack_id: bp.header.uuid, version: bp.header.version }

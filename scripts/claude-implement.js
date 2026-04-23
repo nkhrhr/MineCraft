@@ -9,17 +9,52 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const ISSUE_NUMBER = process.env.ISSUE_NUMBER;
 const REPO = process.env.GITHUB_REPOSITORY;
 
+function requireEnv() {
+  const missing = [];
+  if (!ANTHROPIC_API_KEY) missing.push('ANTHROPIC_API_KEY');
+  if (!GITHUB_TOKEN) missing.push('GITHUB_TOKEN');
+  if (!ISSUE_NUMBER) missing.push('ISSUE_NUMBER');
+  if (!REPO) missing.push('GITHUB_REPOSITORY');
+  if (missing.length) {
+    console.error(`❌ 必要な環境変数が設定されていません: ${missing.join(', ')}`);
+    process.exit(1);
+  }
+}
+
 function httpRequest(options, body) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve({ status: res.statusCode, data: JSON.parse(data) }));
+      res.on('end', () => {
+        let parsed;
+        try { parsed = JSON.parse(data); } catch { parsed = { _raw: data.slice(0, 500) }; }
+        resolve({ status: res.statusCode, data: parsed });
+      });
     });
     req.on('error', reject);
     if (body) req.write(body);
     req.end();
   });
+}
+
+async function postIssueComment(body) {
+  if (!GITHUB_TOKEN || !REPO || !ISSUE_NUMBER) return;
+  try {
+    await httpRequest({
+      hostname: 'api.github.com',
+      path: `/repos/${REPO}/issues/${ISSUE_NUMBER}/comments`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'ArltStory-Bot',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }, JSON.stringify({ body }));
+  } catch (e) {
+    console.error('error comment post failed:', e.message);
+  }
 }
 
 function readFileOrEmpty(filePath) {
@@ -39,6 +74,8 @@ function findFiles(dir, ext) {
 }
 
 async function main() {
+  requireEnv();
+
   // Issue の全コメントを取得（Claude の構造化 + 晄希の修正指示を含む）
   const issueRes = await httpRequest({
     hostname: 'api.github.com',
@@ -134,6 +171,17 @@ ${currentState}
 
   if (claudeRes.status !== 200) {
     console.error('Claude API error:', JSON.stringify(claudeRes.data));
+    await postIssueComment(
+      `⚠️ 晄希、実装中に Claude が答えてくれなかった…\n\nお父さんを呼んでね。（ステータス: ${claudeRes.status}）`
+    );
+    process.exit(1);
+  }
+
+  if (!claudeRes.data || !Array.isArray(claudeRes.data.content) || !claudeRes.data.content[0]) {
+    console.error('Unexpected Claude response shape:', JSON.stringify(claudeRes.data));
+    await postIssueComment(
+      `⚠️ Claude の返事の形が変だったので、実装できなかった。お父さんに確認してもらおう。`
+    );
     process.exit(1);
   }
 
@@ -246,4 +294,10 @@ ${currentState}
   }
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch(async (e) => {
+  console.error(e);
+  await postIssueComment(
+    `⚠️ 実装中に予想外のエラーが起きた。お父さんに見せてね。\n\n\`\`\`\n${(e && e.message) || String(e)}\n\`\`\``
+  );
+  process.exit(1);
+});

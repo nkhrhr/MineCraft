@@ -338,7 +338,7 @@ function renderIdeaCta(issueNumber, phase, build) {
     return `<a class="idea-cta idea-cta--play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">${phase.cta.label}</a>`;
   }
   if (phase.cta?.type === 'build') {
-    return `<button class="idea-cta idea-cta--build" onclick="event.stopPropagation(); approveIdea(${issueNumber})">${phase.cta.label}</button>`;
+    return `<button class="idea-cta idea-cta--build" onclick="event.stopPropagation(); approveIdea(${issueNumber}, this)">${phase.cta.label}</button>`;
   }
   if (phase.statusPill) {
     return `<div class="idea-cta idea-cta--status">${renderHariStatusLine(phase.statusPill.label)}</div>`;
@@ -359,22 +359,45 @@ function renderChatRow(m) {
 }
 
 // "Go!" 相当 — Discussion → Build に進める
-async function approveIdea(issueNumber) {
+async function approveIdea(issueNumber, btn) {
+  if (btn) {
+    if (btn.disabled) return; // 二重送信防止
+    btn.disabled = true;
+    btn.dataset.prevLabel = btn.textContent;
+    btn.textContent = '送信中…';
+  }
+  let succeeded = false;
   try {
     const res = await fetch(`${API}/reply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ issue_number: issueNumber, message: 'Go!' }),
     });
-    if (res.ok) {
+    if (!res.ok) {
       showLiveToast({
-        title: 'Build request sent',
-        message: 'Hari is building your idea now.'
+        title: '送信に失敗しました',
+        message: '少し待ってからもう一度 Build を押してね'
       });
-      refreshAfterAction();
+      return;
     }
+    succeeded = true;
+    showLiveToast({
+      title: 'Build request sent',
+      message: 'Hari is building your idea now.'
+    });
+    refreshAfterAction();
   } catch (e) {
     console.error('approve error:', e);
+    showLiveToast({
+      title: 'ネットに繋がらないみたい',
+      message: 'iPad の Wi-Fi をチェックしてみて'
+    });
+  } finally {
+    if (btn && !succeeded) {
+      // 成功時は refreshAfterAction で再描画されるので戻さなくて良い
+      btn.textContent = btn.dataset.prevLabel || btn.textContent;
+      setTimeout(() => { btn.disabled = false; }, 1500);
+    }
   }
 }
 
