@@ -99,6 +99,10 @@ async function loadIdeas() {
     ]);
     const ideas = await ideasRes.json();
     latestBuild = await buildRes.json();
+    const latestBuildIssue = latestBuild?.issue_number;
+    const buildIssueNumber = Number.isFinite(Number(latestBuildIssue))
+      ? Number(latestBuildIssue)
+      : null;
 
     const container = document.getElementById('idea-list');
     if (!ideas.length) {
@@ -109,7 +113,7 @@ async function loadIdeas() {
     // 現在開いているアイデアは再レンダー後も維持する
     const openIssue = container.querySelector('.idea-item.open')?.dataset?.issue;
 
-    container.innerHTML = ideas.map(idea => renderIdeaItem(idea, latestBuild)).join('');
+    container.innerHTML = ideas.map(idea => renderIdeaItem(idea, latestBuild, buildIssueNumber)).join('');
 
     if (openIssue) {
       const stillThere = container.querySelector(`.idea-item[data-issue="${openIssue}"]`);
@@ -124,8 +128,8 @@ async function loadIdeas() {
   }
 }
 
-function renderIdeaItem(idea, build) {
-  const phase = computeIdeaPhase(idea, build);
+function renderIdeaItem(idea, build, buildIssueNumber = null) {
+  const phase = computeIdeaPhase(idea, build, buildIssueNumber);
   const statusLabel = {
     waiting: 'Waiting',
     responded: 'Responded',
@@ -201,13 +205,21 @@ function renderIdeaTitleWithKokiAvatar(title) {
 // current: which phase is currently active ('discussion' | 'build' | 'play' | 'complete')
 // cta: { type: 'build' | 'play' | null, label, url? }
 // statusPill: { label } or null
-function computeIdeaPhase(idea, build) {
+function computeIdeaPhase(idea, build, buildIssueNumber = null) {
   const steps = { design: 'done', discussion: 'pending', build: 'pending' };
   let current = 'discussion';
   let cta = null;
   let statusPill = null;
 
-  const buildIsNewer = build?.available && build?.date
+  const issueNumber = Number(idea.github_issue_number);
+  const buildTargetIssueNumber = Number.isFinite(Number(buildIssueNumber))
+    ? Number(buildIssueNumber)
+    : (build?.issue_number != null ? Number(build.issue_number) : null);
+  const isCurrentBuildTarget = Number.isFinite(buildTargetIssueNumber) && Number.isFinite(issueNumber)
+    ? buildTargetIssueNumber === issueNumber
+    : false;
+
+  const buildIsNewer = build?.available && build?.date && build?.mcworld_url && isCurrentBuildTarget
     && new Date(build.date) > new Date(idea.updated_at || idea.created_at);
 
   if (idea.status === 'waiting') {
@@ -339,7 +351,10 @@ async function renderIdeaDetails(issueNumber) {
     const data = await res.json();
 
     // 最新ステータスに基づいた進捗を再計算してトグル内の先頭に表示
-    const phase = computeIdeaPhase(data.idea || {}, latestBuild);
+    const detailBuildIssueNumber = latestBuild?.issue_number != null
+      ? Number(latestBuild.issue_number)
+      : null;
+    const phase = computeIdeaPhase(data.idea || {}, latestBuild, detailBuildIssueNumber);
     const progressHtml = renderIdeaProgress(phase.steps);
     const lastUpdated = formatUpdatedAt(new Date((data.idea?.updated_at || data.idea?.created_at)));
     const detailMetaHtml = phase.current === 'complete'

@@ -184,28 +184,10 @@ async function handleAPI(url, request, env) {
       }), { headers });
     }
 
-    // GET /api/latest-build — 最新ビルド
+    // GET /api/latest-build — 最新ビルド（実行中アイデアの紐付けを試行）
     if (url.pathname === '/api/latest-build' && request.method === 'GET') {
-      const res = await fetch(
-        `https://api.github.com/repos/${env.GITHUB_REPO}/releases?per_page=1`,
-        { headers: githubReleaseHeaders }
-      );
-      const releases = await res.json();
-      const rel = releases[0];
-      if (!rel) {
-        return new Response(JSON.stringify({ available: false }), { headers });
-      }
-
-      const mcworld = rel.assets?.find(a => a.name.endsWith('.mcworld'));
-      const mcaddon = rel.assets?.find(a => a.name.endsWith('.mcaddon'));
-
-      return new Response(JSON.stringify({
-        available: true,
-        version: rel.tag_name,
-        date: rel.published_at,
-        mcworld_url: mcworld?.browser_download_url,
-        mcaddon_url: mcaddon?.browser_download_url
-      }), { headers });
+      const build = await getLatestBuildWithIssue(env, githubReleaseHeaders);
+      return new Response(JSON.stringify(build), { headers });
     }
 
     // GET /api/progress — いま晄希がどのステップにいるか（左サイドバー用）
@@ -241,17 +223,7 @@ async function handleAPI(url, request, env) {
       }
 
       // 最新のビルド
-      const relRes = await fetch(
-        `https://api.github.com/repos/${env.GITHUB_REPO}/releases?per_page=1`,
-        { headers: githubReleaseHeaders }
-      );
-      const releases = await relRes.json();
-      const rel = releases[0];
-      const build = rel ? {
-        version: rel.tag_name,
-        date: rel.published_at,
-        mcworld_url: rel.assets?.find(a => a.name.endsWith('.mcworld'))?.browser_download_url
-      } : null;
+      const build = await getLatestBuildWithIssue(env, githubReleaseHeaders);
 
       // ステップ判定
       // 1: まだアイデアがない
@@ -263,6 +235,14 @@ async function handleAPI(url, request, env) {
       let loading = false;
 
       if (idea) {
+        const currentIssueNumber = idea.github_issue_number ? Number(idea.github_issue_number) : null;
+        const buildIssueNumber = build?.issue_number ? Number(build.issue_number) : null;
+        const buildDate = build?.date;
+        const ideaBuildDate = idea.created_at || idea.updated_at;
+        const isBuildForCurrentIdea = buildIssueNumber
+          ? currentIssueNumber && buildIssueNumber === currentIssueNumber
+          : false;
+
         if (idea.status === 'waiting') {
           step = 2;
           loading = true;  // hari が読んでる
@@ -270,8 +250,11 @@ async function handleAPI(url, request, env) {
           step = 2;
           loading = false; // Go 待ち
         } else if (idea.status === 'implementing') {
+          const isBuildNewer = isBuildForCurrentIdea && buildDate && ideaBuildDate
+            ? new Date(buildDate).getTime() > new Date(ideaBuildDate).getTime()
+            : false;
           // ビルドが Go 後に出ているか
-          if (build && new Date(build.date) > new Date(idea.updated_at || idea.created_at)) {
+          if (isBuildNewer) {
             step = 5;
           } else {
             step = 3;
@@ -299,4 +282,62 @@ async function handleAPI(url, request, env) {
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers });
   }
+}
+
+function parseBuildPayload(release) {
+  if (!release) {
+    return { available: false };
+  }
+
+  const mcworld = release.assets?.find((asset) => asset.name.endsWith('.mcworld'));
+  const mcaddon = release.assets?.find((asset) => asset.name.endsWith('.mcaddon'));
+  return {
+    available: true,
+    version: release.tag_name,
+    date: release.published_at,
+    mcworld_url: mcworld?.browser_download_url,
+    mcaddon_url: mcaddon?.browser_download_url
+  };
+}
+
+async function getLatestBuildWithIssue(env, githubReleaseHeaders) {
+  const releaseRes = await fetch(
+    `https://api.github.com/repos/${env.GITHUB_REPO}/releases?per_page=1`,
+    { headers: githubReleaseHeaders }
+  );
+  const releases = await releaseRes.json();
+  const rel = releases?.[0];
+  const build = parseBuildPayload(rel);
+  if (!build.available) {
+    return build;
+  }
+
+  const implementingIdea = await env.DB.prepare(
+    'SELECT github_issue_number, created_at FROM ideas WHERE status = "implementing" ORDER BY created_at DESC LIMIT 1'
+  ).first();
+  if (!implementingIdea?.github_issue_number) {
+    return build;
+  }
+
+  const issueNumber = Number(implementingIdea.github_issue_number);
+  if (Number.isNaN(issueNumber)) {
+    return build;
+  }
+
+  build.issue_number = issueNumber;
+
+  const buildDate = build.date;
+  const issueCreatedAt = implementingIdea.created_at;
+  const hasBuildUrl = !!build.mcworld_url;
+  const buildIsAfterIssue = buildDate && issueCreatedAt
+    ? new Date(buildDate).getTime() > new Date(issueCreatedAt).getTime()
+    : false;
+
+  if (hasBuildUrl && buildIsAfterIssue) {
+    await env.DB.prepare(
+      'UPDATE ideas SET status = "done", completed_at = ? WHERE github_issue_number = ?'
+    ).bind(buildDate, issueNumber).run();
+  }
+
+  return build;
 }
