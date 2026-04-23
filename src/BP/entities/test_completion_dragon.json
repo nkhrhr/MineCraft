@@ -1,0 +1,128 @@
+{
+  "format_version": "1.20.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "story:test_completion_dragon",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": {
+      "story:performing": {
+        "minecraft:behavior.circle_around_anchor": {
+          "priority": 1,
+          "radius_change": 0.5,
+          "radius_adjustment_chance": 0.01,
+          "height_adjustment_chance": 0.005,
+          "goal_radius": 12.0,
+          "angle_change": 8.0,
+          "radius_range": [8.0, 16.0],
+          "height_range": [8.0, 15.0],
+          "height_above_target_range": [15.0, 25.0]
+        },
+        "minecraft:behavior.ranged_attack": {
+          "priority": 2,
+          "burst_shots": 1,
+          "burst_interval": 2.0,
+          "charge_charged_trigger": 0.0,
+          "charge_shoot_trigger": 1.0,
+          "attack_interval_min": 1.0,
+          "attack_interval_max": 2.0,
+          "attack_radius": 30.0
+        },
+        "minecraft:shooter": {
+          "def": "minecraft:dragon_fireball"
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": ["test_dragon", "dragon", "mob"]
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0,
+        "breathes_air": true,
+        "breathes_water": false
+      },
+      "minecraft:collision_box": {
+        "width": 3.0,
+        "height": 3.2
+      },
+      "minecraft:health": {
+        "value": 200,
+        "max": 200
+      },
+      "minecraft:movement": {
+        "value": 0.25
+      },
+      "minecraft:navigation.fly": {
+        "can_path_over_water": true,
+        "can_path_from_air": true
+      },
+      "minecraft:movement.fly": {},
+      "minecraft:can_fly": {},
+      "minecraft:fire_immune": {},
+      "minecraft:physics": {
+        "has_gravity": false
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:behavior.look_at_player": {
+        "priority": 8,
+        "look_distance": 20.0,
+        "probability": 0.8
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 9
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": false
+          }
+        ]
+      },
+      "minecraft:equipment": {
+        "table": "loot_tables/entities/test_dragon_equipment.json"
+      }
+    },
+    "events": {
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": [
+            "story:performing"
+          ]
+        },
+        "run_command": {
+          "command": [
+            "/tellraw @a[r=30] {\"rawtext\":[{\"text\":\"§6§l=== テスト完了演出開始！ ===§r\"}]}",
+            "/playsound mob.enderdragon.growl @a[r=30]",
+            "/particle minecraft:flame_particle ~ ~2 ~ 3 3 3 0.2 50",
+            "/particle minecraft:lava_particle ~ ~2 ~ 2 2 2 0.1 30",
+            "/function test_completion/start_show"
+          ]
+        }
+      },
+      "story:fire_text": {
+        "run_command": {
+          "command": [
+            "/particle minecraft:flame_particle ~0 ~20 ~5 15 3 0 0.1 200",
+            "/particle minecraft:flame_particle ~0 ~20 ~-5 15 3 0 0.1 200",
+            "/particle minecraft:lava_particle ~0 ~18 ~0 12 2 8 0.05 100",
+            "/particle minecraft:campfire_smoke_particle ~0 ~25 ~0 20 5 10 0.02 150",
+            "/particle minecraft:totem_particle ~0 ~15 ~0 8 8 8 0.3 80",
+            "/playsound mob.enderdragon.fireball @a[r=40]",
+            "/tellraw @a[r=40] {\"rawtext\":[{\"text\":\"§c§l🔥 テスト完了 🔥§r\"}]}",
+            "/title @a[r=40] title §6§lテスト完了！",
+            "/title @a[r=40] subtitle §r§e勇者よ、よくやった！"
+          ]
+        }
+      }
+    }
+  }
+}
