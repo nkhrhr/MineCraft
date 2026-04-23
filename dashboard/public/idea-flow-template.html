@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/style.css?v=20260424-ui21">
+  <link rel="stylesheet" href="/style.css?v=20260424-ui22">
   <script src="/hari-building-gifs.js?v=20260424-g01" defer></script>
   <style>
     .chat-thinking {
@@ -98,6 +98,55 @@
       0% { opacity: .2; }
       20% { opacity: 1; }
       100% { opacity: .2; }
+    }
+
+    /* Build 中の「Now I'm building Koki's New World ...」用の段階的ドット
+       1 ドット → 2 → 3 → 4 → 1 と順番に増えるループ。
+       全ドットが同じ 1.6s サイクルで同期するので、4 → 1 へのリセットが一斉に起きる。 */
+    .chat-typing-dots {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .chat-typing-dot {
+      display: inline-block;
+    }
+
+    .chat-typing-dot:nth-child(1) {
+      opacity: 1;
+    }
+
+    .chat-typing-dot:nth-child(2) {
+      opacity: 0;
+      animation: chat-typing-show-25 1.6s infinite steps(1);
+    }
+
+    .chat-typing-dot:nth-child(3) {
+      opacity: 0;
+      animation: chat-typing-show-50 1.6s infinite steps(1);
+    }
+
+    .chat-typing-dot:nth-child(4) {
+      opacity: 0;
+      animation: chat-typing-show-75 1.6s infinite steps(1);
+    }
+
+    @keyframes chat-typing-show-25 {
+      0% { opacity: 0; }
+      25% { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes chat-typing-show-50 {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes chat-typing-show-75 {
+      0% { opacity: 0; }
+      75% { opacity: 1; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
@@ -329,6 +378,10 @@
                 <div class="chat-row chat-row--hari">
                   <img class="chat-avatar chat-avatar--hari" src="/photo-hari.png" alt="Hari">
                   <div class="chat-bubble chat-hari">Hey Koki! I'm crafting your axe-wielding dragon right now — giving it everything I've got. Hang tight, it's gonna be EPIC!</div>
+                </div>
+                <div class="chat-row chat-row--hari">
+                  <img class="chat-avatar chat-avatar--hari" src="/photo-hari.png" alt="Hari">
+                  <div class="chat-bubble chat-hari">Now I'm building Koki's New World<span class="chat-typing-dots" aria-hidden="true"><span class="chat-typing-dot">.</span><span class="chat-typing-dot">.</span><span class="chat-typing-dot">.</span><span class="chat-typing-dot">.</span></span></div>
                 </div>
               </div>
               <p class="tips-link-wrap">
