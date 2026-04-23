@@ -789,6 +789,34 @@ button {
   flex-shrink: 0;
 }
 
+/* Hari が建設中に出すランダム Giphy */
+.idea-flow-giphy {
+  margin: 0 auto 14px;
+  padding: 0;
+  max-width: 280px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.idea-flow-giphy-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Building ステージの説明文を中央寄せにする派生 */
+.idea-flow-note--centered {
+  justify-content: center;
+  text-align: center;
+}
+
 @keyframes ideaFlowSpin {
   to {
     transform: rotate(360deg);

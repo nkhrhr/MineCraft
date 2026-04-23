@@ -341,6 +341,15 @@ function renderIdeaCta(issueNumber, phase, build) {
     return `<button class="idea-cta idea-cta--build" onclick="event.stopPropagation(); approveIdea(${issueNumber}, this)">${phase.cta.label}</button>`;
   }
   if (phase.statusPill) {
+    // Hari が build 中の時だけ Giphy の大きな視覚フィードバック付きで表示
+    if (phase.current === 'build') {
+      return `
+        <div class="idea-cta idea-cta--status idea-cta--status-building">
+          <figure class="idea-flow-giphy" data-hari-building-gif></figure>
+          ${renderHariStatusLine(phase.statusPill.label)}
+        </div>
+      `;
+    }
     return `<div class="idea-cta idea-cta--status">${renderHariStatusLine(phase.statusPill.label)}</div>`;
   }
   return '';
