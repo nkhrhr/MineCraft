@@ -65,21 +65,23 @@ async function loadIdeas() {
 
 function renderIdeaItem(idea, build) {
   const phase = computeIdeaPhase(idea, build);
-  const statusIcon = {
-    'waiting': '⏳',
-    'responded': '💬',
-    'implementing': '🔨',
-    'done': '✅'
-  }[idea.status] || '📝';
+  const statusLabel = {
+    waiting: 'Waiting',
+    responded: 'Responded',
+    implementing: 'Building',
+    done: 'Done'
+  }[idea.status] || 'Draft';
 
-  const lastUpdated = new Date(idea.updated_at || idea.created_at)
-    .toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const updatedAt = new Date(idea.updated_at || idea.created_at);
+  const lastUpdated = isNaN(updatedAt.valueOf())
+    ? 'Updated'
+    : `${formatDateTimeWithTime(updatedAt)} (${formatRelativeFromNow(updatedAt)})`;
 
   const progressHtml = renderIdeaProgress(phase.steps);
   const ctaHtml = renderIdeaCta(idea.github_issue_number, phase, build);
 
   // 完成済み（playable）は summary 全体のトグル tap を外し、
-  // 🎮 Play と 💬 Chat を同サイズで横並び（教育上の等価な価値）
+  // 「View Design Process」と「Play this Idea」を同サイズで横並び
   const isPlayable = phase.cta?.type === 'play';
   const summaryClass = isPlayable ? 'idea-summary idea-summary--readonly' : 'idea-summary';
   const summaryOnclick = isPlayable ? '' : `onclick="toggleIdea(${idea.github_issue_number})"`;
@@ -87,10 +89,10 @@ function renderIdeaItem(idea, build) {
     ? ''  // 完成済みは右端に何も置かない（Play / Chat は下の行に配置）
     : `<span class="idea-chevron" aria-hidden="true">▸</span>`;
 
-  // 完成済みは 💬 Chat + 🎮 Play を 2 列で表示
+  // 完成済みは「View Design Process」と「Play this Idea」を 2 列で表示
   const actionsHtml = isPlayable
     ? `<div class="idea-actions">
-         <button class="idea-cta idea-cta--chat" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number})">💬 Chat</button>
+         <button class="idea-cta idea-cta--chat" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number})">View Design Process</button>
          <a class="idea-cta idea-cta--play" href="${escapeHtml(phase.cta.url)}" download onclick="event.stopPropagation()">${phase.cta.label}</a>
        </div>`
     : ctaHtml;
@@ -99,10 +101,10 @@ function renderIdeaItem(idea, build) {
     <div class="idea-item${isPlayable ? ' idea-item--playable' : ''}" data-issue="${idea.github_issue_number}" data-phase="${phase.current}">
       <div class="${summaryClass}" ${summaryOnclick}>
         <div class="idea-summary-main">
-          <span class="idea-status">${statusIcon}</span>
+          <span class="idea-status">${escapeHtml(statusLabel)}</span>
           <div class="idea-info">
             <h3>${escapeHtml(idea.title)}</h3>
-            <div class="date">📅 Updated ${lastUpdated}</div>
+            <div class="date">Updated ${lastUpdated}</div>
           </div>
           ${rightHtml}
         </div>
@@ -117,7 +119,7 @@ function renderIdeaItem(idea, build) {
 // steps: ['done' | 'current' | 'pending'] for [design, discussion, build, play]
 // current: which phase is currently active ('discussion' | 'build' | 'play' | 'complete')
 // cta: { type: 'build' | 'play' | null, label, url? }
-// statusPill: { icon, label } or null
+// statusPill: { label } or null
 function computeIdeaPhase(idea, build) {
   const steps = { design: 'done', discussion: 'pending', build: 'pending' };
   let current = 'discussion';
@@ -130,28 +132,28 @@ function computeIdeaPhase(idea, build) {
   if (idea.status === 'waiting') {
     steps.discussion = 'current';
     current = 'discussion';
-    statusPill = { icon: '⏳', label: 'Hari is reading your idea...' };
+    statusPill = { label: 'Hari is reading your idea...' };
   } else if (idea.status === 'responded') {
     steps.discussion = 'current';
     current = 'discussion';
-    cta = { type: 'build', label: '🔨 Build' };
+    cta = { type: 'build', label: 'Build' };
   } else if (idea.status === 'implementing') {
     steps.discussion = 'done';
     if (buildIsNewer && build?.mcworld_url) {
       steps.build = 'done';
       current = 'complete';
-      cta = { type: 'play', label: '🎮 Play', url: build.mcworld_url };
+      cta = { type: 'play', label: 'Play this Idea', url: build.mcworld_url };
     } else {
       steps.build = 'current';
       current = 'build';
-      statusPill = { icon: '🔨', label: 'Hari is building...' };
+      statusPill = { label: 'Hari is building...' };
     }
   } else if (idea.status === 'done') {
     steps.discussion = 'done';
     steps.build = 'done';
     current = 'complete';
     if (build?.mcworld_url) {
-      cta = { type: 'play', label: '🎮 Play', url: build.mcworld_url };
+      cta = { type: 'play', label: 'Play this Idea', url: build.mcworld_url };
     }
   }
 
@@ -160,7 +162,7 @@ function computeIdeaPhase(idea, build) {
 
 function renderIdeaProgress(steps) {
   const entries = [
-    ['design', 'Koki Design'],
+    ['design', 'Idea'],
     ['discussion', 'Discussion with Hari'],
     ['build', 'Build with Hari'],
   ];
@@ -185,7 +187,7 @@ function renderIdeaCta(issueNumber, phase, build) {
     return `<button class="idea-cta idea-cta--build" onclick="event.stopPropagation(); approveIdea(${issueNumber})">${phase.cta.label}</button>`;
   }
   if (phase.statusPill) {
-    return `<div class="idea-cta idea-cta--status"><span>${phase.statusPill.icon}</span> ${escapeHtml(phase.statusPill.label)}</div>`;
+    return `<div class="idea-cta idea-cta--status">${escapeHtml(phase.statusPill.label)}</div>`;
   }
   return '';
 }
@@ -262,10 +264,10 @@ async function renderIdeaDetails(issueNumber) {
     for (const k of (data.koki || [])) messages.push({ type: 'koki', body: k.body, time: k.created_at });
     messages.sort((a, b) => new Date(a.time) - new Date(b.time));
 
-    // Koki Design グループ: Title + Description を値だけプレーン表示
+    // Idea グループ: タイトルと本文をプレーン表示
     const designGroup = `
       <section class="idea-group">
-        <h4 class="idea-group-title">🎨 Koki Design</h4>
+        <h4 class="idea-group-title">Idea</h4>
         <div class="idea-title-display">${escapeHtml(data.idea?.title || '')}</div>
         <div class="idea-body">${escapeHtml(data.idea?.body || '')}</div>
       </section>
@@ -273,7 +275,7 @@ async function renderIdeaDetails(issueNumber) {
 
     // Discussion with Hari グループ: Chat + Reply
     const chatContent = messages.length === 0
-      ? '<p class="empty">⏳ Hari is reading it. Please wait...</p>'
+      ? '<p class="empty">Hari is reading it. Please wait...</p>'
       : `<div class="idea-chat">${messages.map(m => renderChatRow(m)).join('')}</div>`;
 
     // Build（承認）は summary の primary CTA にあるので、ここは修正返信だけ。
@@ -286,7 +288,7 @@ async function renderIdeaDetails(issueNumber) {
           <p class="field-kicker">Reply</p>
           <textarea id="reply-text-${issueNumber}" rows="3" placeholder="hari に変えたい所を伝える..."></textarea>
           <div class="reply-buttons">
-            <button class="btn-discussion" onclick="sendReply(${issueNumber})">💬 Discussion</button>
+            <button class="btn-discussion" onclick="sendReply(${issueNumber})">Discussion</button>
           </div>
         </div>
       `
@@ -294,7 +296,7 @@ async function renderIdeaDetails(issueNumber) {
 
     const discussionGroup = `
       <section class="idea-group">
-        <h4 class="idea-group-title">💬 Discussion with Hari</h4>
+        <h4 class="idea-group-title">Discussion with Hari</h4>
         ${chatContent}
         ${replyContent}
       </section>
@@ -320,13 +322,13 @@ async function submitIdea() {
 
   if (!title || !body) {
     statusEl.textContent = 'Please write a title and details.';
-    statusEl.style.color = '#e94560';
+    statusEl.style.color = '#000000';
     return;
   }
 
   btn.disabled = true;
   statusEl.textContent = 'Sending...';
-  statusEl.style.color = '#888';
+  statusEl.style.color = '#000000';
 
   try {
     const res = await fetch(`${API}/ideas`, {
@@ -337,18 +339,18 @@ async function submitIdea() {
 
     if (res.ok) {
       statusEl.textContent = 'Sent! Hari will read it soon.';
-      statusEl.style.color = '#4ade80';
+      statusEl.style.color = '#000000';
       titleEl.value = '';
       bodyEl.value = '';
       refreshAfterAction();
     } else {
       const err = await res.json();
       statusEl.textContent = mapSubmitError(err.error);
-      statusEl.style.color = '#e94560';
+      statusEl.style.color = '#000000';
     }
   } catch (e) {
     statusEl.textContent = 'Network error.';
-    statusEl.style.color = '#e94560';
+    statusEl.style.color = '#000000';
   }
 
   btn.disabled = false;
@@ -388,7 +390,7 @@ async function sendReply(issueNumber, preset) {
         const chat2 = item?.querySelector('.idea-chat');
         if (chat2) {
           chat2.insertAdjacentHTML('beforeend',
-            '<p class="empty">🔨 Hari is starting now. I will let you know when it is ready.</p>');
+            '<p class="empty">Hari is starting now. I will let you know when it is ready.</p>');
         }
       }
 
@@ -409,6 +411,43 @@ function mapSubmitError(errorMessage) {
 }
 
 // --- ユーティリティ ---
+function formatDateTimeWithTime(date) {
+  const monthDay = date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+  const time = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+  return `${monthDay} ${time}`;
+}
+
+function formatRelativeFromNow(date) {
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  const deltaSeconds = Math.floor((new Date(date).getTime() - Date.now()) / 1000);
+  const units = [
+    ['year', 31536000],
+    ['month', 2592000],
+    ['day', 86400],
+    ['hour', 3600],
+    ['minute', 60],
+    ['second', 1],
+  ];
+
+  if (Math.abs(deltaSeconds) < 60) return 'just now';
+
+  for (const [unit, seconds] of units) {
+    if (Math.abs(deltaSeconds) >= seconds) {
+      const value = Math.trunc(deltaSeconds / seconds);
+      return rtf.format(value, unit);
+    }
+  }
+
+  return 'just now';
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;

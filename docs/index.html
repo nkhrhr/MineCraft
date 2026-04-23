@@ -6,24 +6,26 @@
   <title>物語アドオン</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+  body {
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-      color: #fff;
+      color: #000000;
       display: flex;
       justify-content: center;
       padding: 40px 20px;
+      line-height: 1.7;
     }
     .container { max-width: 480px; width: 100%; }
-    h1 { font-size: 2em; margin-bottom: 4px; }
-    .meta { opacity: 0.6; margin-bottom: 24px; }
-    .card {
+    h1 { font-size: 2em; margin-bottom: 4px; line-height: 1.4; }
+    .meta { color: #000000; opacity: 0.85; margin-bottom: 24px; }
+    .card { 
       background: rgba(255,255,255,0.08);
       backdrop-filter: blur(12px);
       border-radius: 16px;
       padding: 24px;
       margin-bottom: 16px;
+      color: #000000;
     }
     .btn {
       display: block;
@@ -49,6 +51,7 @@
       padding: 8px 0;
       padding-left: 32px;
       position: relative;
+      line-height: 1.6;
     }
     .steps li::before {
       content: counter(step);
@@ -62,7 +65,7 @@
       font-size: 0.85em;
     }
     .changelog { opacity: 0.8; font-size: 0.9em; }
-    .changelog li { padding: 2px 0; }
+    .changelog li { padding: 2px 0; line-height: 1.6; color: #000000; }
     #loading { text-align: center; opacity: 0.5; padding: 20px; }
   </style>
 </head>

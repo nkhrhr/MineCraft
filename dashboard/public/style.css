@@ -6,8 +6,8 @@
   --surface-strong: #fffaf1;
   --surface-dark: #21352a;
   --surface-dark-2: #2e513d;
-  --ink: #1f261f;
-  --ink-soft: #5f6a61;
+  --ink: #000000;
+  --ink-soft: #000000;
   --line: rgba(34, 42, 36, 0.1);
   --line-strong: rgba(34, 42, 36, 0.18);
   --accent: #1f9d63;
@@ -37,6 +37,7 @@ body {
   color: var(--ink);
   min-height: 100dvh;
   padding: 24px;
+  line-height: 1.7;
   background:
     radial-gradient(circle at top left, rgba(255, 245, 221, 0.9), transparent 36%),
     radial-gradient(circle at bottom right, rgba(196, 231, 208, 0.65), transparent 28%),
@@ -105,7 +106,7 @@ header {
 }
 
 .eyebrow {
-  color: rgba(255, 255, 255, 0.72);
+  color: #000000;
   margin-bottom: 10px;
 }
 
@@ -115,7 +116,7 @@ header {
   font-family: "Playwrite NZ Guides", "Segoe Script", "Bradley Hand", cursive;
   font-weight: 400;
   font-size: clamp(1.7rem, 3.5vw, 2.4rem);
-  line-height: 1.15;
+  line-height: 1.45;
   letter-spacing: 0.01em;
   color: var(--ink);
   margin-bottom: 0;
@@ -127,7 +128,7 @@ header {
 
 /* プロジェクト名（Minecraft / Cooking 等）は軽くアクセント色にしておく */
 .brand-line--project {
-  color: var(--accent-deep);
+  color: #000000;
 }
 
 main {
@@ -151,7 +152,7 @@ main {
 }
 
 .section-kicker {
-  color: var(--accent-deep);
+  color: #000000;
   margin-bottom: 10px;
 }
 
@@ -161,20 +162,20 @@ main {
   letter-spacing: 0.18em;
   font-size: 0.72rem;
   font-weight: 800;
-  color: var(--accent-deep);
+  color: #000000;
   margin: 4px 0 8px;
 }
 
 .card h2 {
   font-size: 1.55rem;
-  line-height: 1.08;
+  line-height: 1.45;
   margin-bottom: 10px;
 }
 
 .section-copy {
-  color: var(--ink-soft);
+  color: #000000;
   font-size: 0.98rem;
-  line-height: 1.65;
+  line-height: 1.75;
 }
 
 input[type="text"],
@@ -186,7 +187,7 @@ textarea {
   padding: 14px 16px;
   color: var(--ink);
   font-size: 1rem;
-  line-height: 1.55;
+  line-height: 1.7;
   font-family: var(--font-ui);
   resize: vertical;
   margin-bottom: 12px;
@@ -199,7 +200,7 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-  color: #7f877f;
+  color: #000000;
 }
 
 input:focus,
@@ -221,10 +222,10 @@ button {
   padding: 16px 18px;
   border-radius: 18px;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
-  color: #fffdf6;
+  color: #000000;
   font-weight: 800;
   font-size: 1rem;
-  line-height: 1.4;
+  line-height: 1.5;
   letter-spacing: 0.01em;
   white-space: normal;
   box-shadow: 0 16px 28px rgba(31, 157, 99, 0.22);
@@ -249,7 +250,7 @@ button {
   min-height: 1.4em;
   margin-top: 10px;
   font-size: 0.92rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 #idea-list {
@@ -319,7 +320,7 @@ button {
 }
 
 .idea-chevron {
-  color: var(--ink-soft);
+  color: #000000;
   font-size: 1.1rem;
   transition: transform 0.2s ease;
   flex-shrink: 0;
@@ -327,7 +328,7 @@ button {
 
 .idea-item.open .idea-chevron {
   transform: rotate(90deg);
-  color: var(--accent-deep);
+  color: #000000;
 }
 
 /* 完成済みアイデア用: summary 全体はタップ非反応、下の 2 ボタンだけが操作対象 */
@@ -350,7 +351,7 @@ button {
 .idea-cta--chat {
   background: rgba(255, 255, 255, 0.85);
   border: 2px solid rgba(31, 157, 99, 0.34);
-  color: var(--accent-deep);
+  color: #000000;
   box-shadow: 0 8px 18px rgba(31, 157, 99, 0.08);
 }
 
@@ -367,13 +368,19 @@ button {
 }
 
 .idea-status {
-  width: 42px;
-  height: 42px;
+  width: auto;
+  min-width: 58px;
+  height: 24px;
+  color: #000000;
   border-radius: 14px;
   display: grid;
   place-items: center;
   background: var(--amber-soft);
   flex-shrink: 0;
+  padding: 0 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .idea-info {
@@ -383,16 +390,17 @@ button {
 
 .idea-info h3 {
   font-size: 1rem;
-  line-height: 1.45;
+  line-height: 1.6;
   margin-bottom: 4px;
 }
 
 .idea-info .date {
-  color: var(--ink-soft);
+  color: #000000;
   font-size: 0.86rem;
+  line-height: 1.5;
 }
 
-/* 各アイデアの進捗ステッパー: 🎨 Design → 💬 Discussion → 🔨 Build */
+/* 各アイデアの進捗ステッパー: Design -> Discussion -> Build */
 .idea-progress {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -403,7 +411,6 @@ button {
 .idea-details > .idea-progress {
   padding: 8px 4px 14px;
   margin-bottom: 6px;
-  border-bottom: 1px dashed rgba(34, 42, 36, 0.08);
 }
 
 .idea-progress-step {
@@ -433,8 +440,8 @@ button {
 }
 
 .idea-progress-icon {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   border-radius: 999px;
   background: #fff;
   border: 2px solid rgba(31, 38, 31, 0.14);
@@ -443,19 +450,19 @@ button {
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-/* 完了ステップ: 白い円 + 緑枠 + 中央に ✓ のみ */
+/* 完了ステップ: 白い円 + 緑枠 + 中央にチェックのみ */
 .idea-progress-step--done .idea-progress-icon {
   background: #fff;
   border-color: var(--accent-deep);
 }
 
 .idea-progress-step--done .idea-progress-icon::before {
-  content: "✓";
+  content: "";
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  color: var(--accent-deep);
+  color: #000000;
   font-size: 0.82rem;
   font-weight: 900;
   line-height: 1;
@@ -498,18 +505,18 @@ button {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--ink-soft);
+  color: #000000;
   text-align: center;
-  line-height: 1.25;
+  line-height: 1.7;
   word-break: keep-all;
 }
 
 .idea-progress-step--done .idea-progress-label {
-  color: var(--accent-deep);
+  color: #000000;
 }
 
 .idea-progress-step--current .idea-progress-label {
-  color: var(--accent-deep);
+  color: #000000;
 }
 
 /* アイデアごとの primary CTA（フェーズに応じて一つだけ表示） */
@@ -534,7 +541,7 @@ button {
 
 .idea-cta--play {
   background: linear-gradient(135deg, #fff4d2 0%, #f6d47d 100%);
-  color: #1e261f;
+  color: #000000;
   box-shadow: 0 12px 24px rgba(23, 34, 27, 0.16);
 }
 
@@ -545,7 +552,7 @@ button {
 
 .idea-cta--build {
   background: linear-gradient(135deg, #32bf7d, #149f5d);
-  color: #fffdf8;
+  color: #000000;
   box-shadow: 0 12px 24px rgba(20, 159, 93, 0.22);
 }
 
@@ -557,7 +564,7 @@ button {
 .idea-cta--status {
   background: rgba(244, 200, 96, 0.14);
   border: 1px dashed rgba(244, 200, 96, 0.38);
-  color: #8a6208;
+  color: #000000;
   font-weight: 700;
   font-size: 0.94rem;
   cursor: default;
@@ -592,10 +599,9 @@ button {
 .idea-group-title {
   font-size: 1rem;
   font-weight: 800;
-  color: var(--accent-deep);
+  color: #000000;
   padding-bottom: 8px;
   margin-bottom: 14px;
-  border-bottom: 1px solid rgba(31, 157, 99, 0.22);
 }
 
 /* 既存アイデアは読み取り専用の表示なので枠や背景なし（プレーンテキスト扱い） */
@@ -605,7 +611,7 @@ button {
   border: none;
   font-weight: 700;
   font-size: 1.05rem;
-  line-height: 1.5;
+  line-height: 1.85;
   margin-bottom: 14px;
   color: var(--ink);
 }
@@ -617,7 +623,7 @@ button {
   border: none;
   color: var(--ink);
   white-space: pre-wrap;
-  line-height: 1.7;
+  line-height: 1.85;
 }
 
 /* iOS iMessage 風チャット（アバター付き） */
@@ -666,7 +672,6 @@ button {
 .idea-reply {
   margin-top: 12px;
   padding-top: 14px;
-  border-top: 1px solid rgba(34, 42, 36, 0.08);
 }
 
 .empty {
@@ -674,7 +679,7 @@ button {
   border-radius: 18px;
   border: 1px dashed rgba(34, 42, 36, 0.14);
   background: rgba(255, 255, 255, 0.62);
-  color: var(--ink-soft);
+  color: #000000;
   text-align: center;
   line-height: 1.6;
 }
@@ -684,7 +689,7 @@ button {
   padding: 9px 14px;
   border-radius: 20px;
   font-size: 0.98rem;
-  line-height: 1.42;
+  line-height: 1.65;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -695,14 +700,14 @@ button {
 /* Hari = 受信側: iOS グレー、左下の角を削って尻尾風に */
 .chat-hari {
   background: #e9e9eb;
-  color: #1f261f;
+  color: #000000;
   border-bottom-left-radius: 6px;
 }
 
 /* Koki = 送信側: iMessage ブルー、右下の角を削って尻尾風に */
 .chat-koki {
   background: linear-gradient(180deg, #3fa7fb 0%, #1e7fd6 100%);
-  color: #ffffff;
+  color: #000000;
   border-bottom-right-radius: 6px;
 }
 
@@ -744,7 +749,7 @@ button {
 
 .btn-build {
   background: linear-gradient(135deg, #32bf7d, #149f5d);
-  color: #fffdf8;
+  color: #000000;
 }
 
 .btn-discussion {
