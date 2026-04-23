@@ -305,8 +305,12 @@ async function getLatestBuildWithIssue(env, githubReleaseHeaders) {
     `https://api.github.com/repos/${env.GITHUB_REPO}/releases?per_page=1`,
     { headers: githubReleaseHeaders }
   );
+  if (!releaseRes.ok) {
+    return { available: false };
+  }
+
   const releases = await releaseRes.json();
-  const rel = releases?.[0];
+  const rel = Array.isArray(releases) ? releases[0] : null;
   const build = parseBuildPayload(rel);
   if (!build.available) {
     return build;
@@ -334,9 +338,16 @@ async function getLatestBuildWithIssue(env, githubReleaseHeaders) {
     : false;
 
   if (hasBuildUrl && buildIsAfterIssue) {
-    await env.DB.prepare(
-      'UPDATE ideas SET status = "done", completed_at = ? WHERE github_issue_number = ?'
+    const updateResult = await env.DB.prepare(
+      'UPDATE ideas SET status = "done", completed_at = ? WHERE github_issue_number = ? AND status != "done"'
     ).bind(buildDate, issueNumber).run();
+
+    // 完了状態への初回遷移のみカウントする
+    if (updateResult.meta?.changes > 0) {
+      await env.DB.prepare(
+        'UPDATE stats SET total_completed = total_completed + 1, updated_at = datetime("now") WHERE id = 1'
+      ).run();
+    }
   }
 
   return build;
