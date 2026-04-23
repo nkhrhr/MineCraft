@@ -736,7 +736,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 5px;
   width: 100%;
   min-width: 0;
   overflow: hidden;
@@ -806,15 +806,18 @@ button {
   border: none;
   background: transparent;
   color: #000000;
-  font-size: 0.86rem;
-  font-weight: 800;
-  line-height: 1.4;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
   white-space: nowrap;
   justify-content: flex-start;
   border-radius: 0;
   flex-shrink: 0;
   color: #161a18;
-  font-weight: 700;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .idea-cta--toggle::after {
@@ -873,21 +876,30 @@ button {
 .idea-title-with-avatar {
   display: inline-flex;
   align-items: flex-start;
-  flex-wrap: wrap;
   gap: 7px;
   color: #000000;
+  min-width: 0;
+}
+
+.idea-title-text {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
 .idea-title-prefix {
   font-weight: 700;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .idea-title-quotes {
   min-width: 0;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: break-word;
+  white-space: normal;
+  line-height: 1.46;
 }
 
 .idea-title-avatar {
@@ -902,7 +914,7 @@ button {
 
 .idea-title-display {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 7px;
   color: #000000;
 }
@@ -957,8 +969,8 @@ button {
 .idea-progress {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: 8px 2px 4px;
-  margin: 10px 0 16px;
+  padding: 8px 1px 4px;
+  margin: 10px 0 12px;
 }
 
 /* トグル内（details 内）に出すときは下に余白 */
@@ -971,7 +983,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   position: relative;
   min-width: 0;
 }
@@ -983,7 +995,7 @@ button {
   top: 10px;
   left: calc(50% + 14px);
   right: calc(-50% + 14px);
-  height: 3px;
+  height: 2px;
   border-radius: 2px;
   background: var(--line);
   z-index: 0;
@@ -998,11 +1010,11 @@ button {
 }
 
 .idea-progress-icon {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   border-radius: 999px;
   background: #fff;
-  border: 2px solid rgba(31, 38, 31, 0.14);
+  border: 1.5px solid rgba(31, 38, 31, 0.14);
   position: relative;
   z-index: 1;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
@@ -1037,18 +1049,18 @@ button {
 
 @keyframes minecraftPulse {
   0%, 100% {
-    transform: scale(1.06);
+    transform: scale(1.05);
     box-shadow:
       0 0 0 0 rgba(31, 157, 99, 0.6),
-      0 0 0 4px rgba(31, 157, 99, 0.22),
-      0 0 8px rgba(50, 191, 125, 0.55);
+      0 0 0 3px rgba(31, 157, 99, 0.22),
+      0 0 6px rgba(50, 191, 125, 0.5);
   }
   50% {
-    transform: scale(1.12);
+    transform: scale(1.09);
     box-shadow:
-      0 0 0 4px rgba(31, 157, 99, 0.32),
-      0 0 0 9px rgba(31, 157, 99, 0.08),
-      0 0 18px rgba(108, 231, 166, 0.9);
+      0 0 0 3px rgba(31, 157, 99, 0.28),
+      0 0 0 8px rgba(31, 157, 99, 0.08),
+      0 0 16px rgba(108, 231, 166, 0.85);
   }
 }
 
@@ -1056,7 +1068,7 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .idea-progress-step--current .idea-progress-icon {
     animation: none;
-    transform: scale(1.1);
+    transform: scale(1.05);
     box-shadow: 0 0 0 5px rgba(31, 157, 99, 0.22);
   }
 }
@@ -1391,14 +1403,22 @@ button {
   }
 
   .idea-progress-icon {
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
   }
 
   .idea-progress-step:not(:last-child)::after {
-    left: calc(50% + 13px);
-    right: calc(-50% + 13px);
+    left: calc(50% + 12px);
+    right: calc(-50% + 12px);
     height: 2px;
-    top: 9px;
+    top: 8px;
+  }
+
+  .idea-cta--link {
+    font-size: 0.74rem;
+  }
+
+  .idea-title-prefix {
+    font-size: 0.9rem;
   }
 }

@@ -177,7 +177,7 @@ function renderIdeaItem(idea, build, buildIssueNumber = null) {
   const actionsHtml = isPlayable
     ? `<div class="idea-actions idea-actions--playable">
          ${playActionHtml}
-         <button class="idea-cta idea-cta--link idea-cta--toggle" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number});" aria-expanded="false" data-issue="${idea.github_issue_number}">Design process</button>
+         <button class="idea-cta idea-cta--link idea-cta--toggle" type="button" onclick="event.stopPropagation(); toggleIdea(${idea.github_issue_number});" aria-expanded="false" data-issue="${idea.github_issue_number}" aria-label="View Design Process">Design process</button>
          ${dateHtml}
        </div>`
     : ctaHtml;
@@ -207,8 +207,10 @@ function renderIdeaTitleWithKokiAvatar(title) {
   return `
     <span class="idea-title-with-avatar">
       <img class="idea-title-avatar" src="/photo-koki.png" alt="Koki" loading="lazy">
-      <span class="idea-title-prefix">Koki's Idea</span>
-      <span class="idea-title-quotes">「${escapeHtml(title || '')}」</span>
+      <span class="idea-title-text">
+        <span class="idea-title-prefix">Koki's Idea</span>
+        <span class="idea-title-quotes">「${escapeHtml(title || '')}」</span>
+      </span>
     </span>
   `;
 }
