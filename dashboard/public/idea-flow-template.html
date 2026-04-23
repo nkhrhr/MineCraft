@@ -31,6 +31,53 @@
   </header>
 
   <main class="flow-template-page dashboard-grid">
+    <section id="new-idea-section" class="card">
+      <div class="section-head section-head--new">
+        <p class="brand-tagline">
+          <span class="brand-tagline-line">
+            <span class="brand-tagline-text">Hi,</span>
+            <img src="/photo-koki.png" alt="" class="brand-tagline-avatar">
+            <span class="brand-tagline-name">Koki.</span>
+            <span class="brand-tagline-text">Design your Minecraft with</span>
+            <img src="/photo-hari.png" alt="" class="brand-tagline-avatar">
+            <span class="brand-tagline-name">Hari.</span>
+          </span>
+        </p>
+      </div>
+      <div id="new-idea-card" class="idea-item idea-item-new open">
+        <div class="idea-summary">
+          <div class="idea-progress" aria-label="Phase progress">
+            <span class="idea-progress-step idea-progress-step--current">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Design by Koki</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--pending">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Discussion with Hari</span>
+            </span>
+            <span class="idea-progress-step idea-progress-step--pending">
+              <span class="idea-progress-icon"></span>
+              <span class="idea-progress-label">Build by Hari</span>
+            </span>
+          </div>
+        </div>
+        <div class="idea-details" aria-hidden="false">
+          <input type="text" id="idea-title" maxlength="80" aria-label="Idea title" placeholder="タイトル例：初心者向けドラゴン討伐クエスト">
+          <textarea id="idea-body" rows="8" aria-label="Idea details" placeholder="世界観、登場人物、進行ルールを短く入力してください。"></textarea>
+          <button id="submit-btn" type="button">
+            <img class="submit-btn-avatar" src="/photo-hari.png" alt="">
+            Send to Hari
+          </button>
+          <p class="tips-link-wrap">
+            <button type="button" id="open-tips-btn" class="tips-link-btn">
+              Hint &amp; Tips
+            </button>
+          </p>
+          <p id="submit-status" class="status-msg"></p>
+        </div>
+      </div>
+    </section>
+
     <section class="card">
       <div class="section-head">
         <p class="eyebrow">Template</p>
