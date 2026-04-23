@@ -26,7 +26,7 @@
     .chat-thinking {
       display: inline-flex;
       align-items: center;
-      gap: 0.32rem;
+      gap: 0.08rem;
     }
 
     .chat-thinking-label {
@@ -37,10 +37,11 @@
       display: inline-flex;
       align-items: center;
       line-height: 1;
-      min-width: 1.2em;
       white-space: nowrap;
       color: #000;
       font-weight: 600;
+      margin: 0;
+      padding: 0;
     }
 
     .chat-thinking-dot {
@@ -63,16 +64,6 @@
 
     .chat-thinking-dot:nth-child(4) {
       animation-delay: 0.6s;
-    }
-
-    .chat-thinking-dot:nth-child(2),
-    .chat-thinking-dot:nth-child(3),
-    .chat-thinking-dot:nth-child(4) {
-      margin-left: -0.05em;
-    }
-
-    .chat-thinking-dot[aria-hidden="true"] {
-      width: 0.62em;
     }
 
     @keyframes idea-thinking-dot {
