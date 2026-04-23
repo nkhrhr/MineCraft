@@ -21,12 +21,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/style.css?v=20260424-ui13">
+  <link rel="stylesheet" href="/style.css?v=20260424-ui16">
   <style>
     .chat-thinking {
       display: inline-flex;
       align-items: center;
       gap: 0.08rem;
+      line-height: 1;
+    }
+
+    .chat-row:has(.chat-thinking) .chat-avatar {
+      visibility: visible;
     }
 
     .chat-thinking-label {
@@ -184,6 +189,11 @@
                 <img class="submit-btn-avatar" src="/photo-hari.png" alt="" aria-hidden="true">
                 Send to Hari
               </button>
+              <p class="tips-link-wrap">
+                <button type="button" class="tips-link-btn">
+                  Hint &amp; Tips
+                </button>
+              </p>
           </div>
         </div>
       </section>
@@ -222,7 +232,6 @@
           </div>
           <div class="idea-details" aria-hidden="false">
             <section class="idea-group">
-              <h4 class="idea-group-title">Discussion with Hari</h4>
               <div class="idea-chat">
                 <div class="chat-row chat-row--hari">
                   <img class="chat-avatar chat-avatar--hari" src="/photo-hari.png" alt="Hari">
@@ -254,6 +263,11 @@
                   <img class="submit-btn-avatar" src="/photo-hari.png" alt="" aria-hidden="true">
                   Send to Hari
                 </button>
+                <p class="tips-link-wrap">
+                  <button type="button" class="tips-link-btn">
+                    Hint &amp; Tips
+                  </button>
+                </p>
               </div>
             </section>
           </div>
@@ -294,10 +308,14 @@
           </div>
           <div class="idea-details" aria-hidden="false">
             <section class="idea-group">
-              <h4 class="idea-group-title">Build by Hari</h4>
               <p class="idea-flow-note">
                 <span class="idea-flow-loader" aria-hidden="true"></span>
-                晄希！いま斧を持ったドラゴン、全力で作ってるとこ！もうちょいだけ待っててね、絶対かっこよくするから！
+                Hey Koki! I'm crafting your axe-wielding dragon right now — giving it everything I've got. Hang tight, it's gonna be EPIC!
+              </p>
+              <p class="tips-link-wrap">
+                <button type="button" class="tips-link-btn">
+                  Hint &amp; Tips
+                </button>
               </p>
             </section>
           </div>
@@ -338,12 +356,16 @@
           </div>
           <div class="idea-details" aria-hidden="false">
             <section class="idea-group">
-              <h4 class="idea-group-title">Build complete</h4>
-              <p class="idea-body">できたよ晄希！！斧を持ったドラゴンのワールド、今すぐダウンロードして遊べる！一緒に討伐しに行こう！</p>
-              <button class="submit-btn" type="button">
+              <p class="idea-body">It's done, Koki!! Your axe-wielding dragon world is ready to download and play RIGHT NOW. Let's go take it down together!</p>
+              <button class="submit-btn idea-play-cta" type="button">
                 <img class="submit-btn-avatar" src="/photo-hari.png" alt="" aria-hidden="true">
                 Play this Idea
               </button>
+              <p class="tips-link-wrap">
+                <button type="button" class="tips-link-btn">
+                  Hint &amp; Tips
+                </button>
+              </p>
             </section>
           </div>
         </div>

@@ -1419,6 +1419,10 @@ button {
   line-height: 1.85;
 }
 
+.idea-play-cta {
+  margin-top: 22px;
+}
+
 /* iOS iMessage 風チャット（アバター付き） */
 .idea-chat {
   display: flex;
