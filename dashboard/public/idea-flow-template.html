@@ -189,12 +189,12 @@
       </section>
     </div>
 
-    <div class="flow-state-block">
+    <div class="flow-state-block flow-stage is-active" data-state="discussion">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Discussion with Hari</p>
       </div>
-      <section id="flow-discussion" class="card new-idea-flow-card flow-stage is-active" data-state="discussion">
+      <section id="flow-discussion" class="card new-idea-flow-card">
         <div class="idea-item idea-item-new open">
           <div class="idea-summary">
             <div class="idea-progress" aria-label="Phase progress">
@@ -246,14 +246,14 @@
       </section>
     </div>
 
-    <div class="flow-state-block">
+    <div class="flow-state-block flow-stage" data-state="building">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Build by Hari</p>
       </div>
     </div>
 
-    <div class="flow-state-block">
+    <div class="flow-state-block flow-stage" data-state="complete">
       <div class="section-head section-head--new">
         <h2 class="new-idea-flow-title">Koki's Idea「ドラゴンが斧を持ってテスト完了を演出してほしい」</h2>
         <p class="new-idea-flow-subtitle">Build complete</p>
@@ -273,6 +273,10 @@
       }
 
       function setActiveStage(state) {
+        if (!state) {
+          return;
+        }
+
         stages.forEach((stage) => {
           stage.classList.toggle('is-active', stage.dataset.state === state);
         });
