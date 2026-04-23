@@ -1216,7 +1216,7 @@ button {
   height: auto;
   background-image: url('/progress-check.svg');
   background-repeat: no-repeat;
-  background-size: 82%;
+  background-size: 100%;
   background-position: center;
 }
 
