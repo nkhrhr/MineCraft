@@ -1491,10 +1491,10 @@ button {
 
 .chat-bubble {
   max-width: 72%;
-  padding: 9px 14px;
+  padding: 12px 18px;
   border-radius: 20px;
   font-size: 0.98rem;
-  line-height: 1.65;
+  line-height: 1.85;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1512,7 +1512,7 @@ button {
 /* Koki = 送信側: iMessage ブルー、右下の角を削って尻尾風に */
 .chat-koki {
   background: linear-gradient(180deg, #3fa7fb 0%, #1e7fd6 100%);
-  color: #000000;
+  color: #ffffff;
   border-bottom-right-radius: 6px;
 }
 
