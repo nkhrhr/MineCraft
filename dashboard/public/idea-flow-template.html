@@ -21,12 +21,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playwrite+NZ+Guides:wght@400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="/style.css?v=20260424-ui16">
+  <link rel="stylesheet" href="/style.css?v=20260424-ui17">
   <style>
     .chat-thinking {
       display: inline-flex;
       align-items: center;
       gap: 0.08rem;
+      line-height: 1;
+    }
+
+    .chat-bubble:has(.chat-thinking) {
+      padding: 8px 14px;
       line-height: 1;
     }
 
